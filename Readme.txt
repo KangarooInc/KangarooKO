@@ -1,2 +1,5 @@
 This repository contains all the files for the project.
-This is my shit, don't touch it or I'll punch you in the throat.
+Create you own branch and modify that.
+This master branch should not be edited unless everything on your own branch works.
+
+What up
