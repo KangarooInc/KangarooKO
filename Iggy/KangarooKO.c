@@ -76,6 +76,7 @@ int done=0;
 typedef struct t_kangaroo {
     Vec pos;
     Vec vel;
+    Flt radius;
 } Kangaroo;
 Kangaroo kangaroo;
 
@@ -409,6 +410,7 @@ void init() {
 #endif //USE_UMBRELLA
     MakeVector(-150.0,180.0,0.0, kangaroo.pos);
     MakeVector(6.0,0.0,0.0, kangaroo.vel);
+    kangaroo.radius = (8.0 + rnd() * 100);
 
     MakeVector(150.0,180.0,0.0, rhino.pos);
     MakeVector(-6.0,0.0,0.0, rhino.vel);
@@ -461,7 +463,7 @@ void check_keys(XEvent *e)
 	return;
     }
     //
-    Flt d0,d1;
+    Flt d0,d1,dist;
     switch(key) {
 	case XK_k:
 	    show_kangaroo ^= 1;
@@ -513,6 +515,14 @@ void check_keys(XEvent *e)
     case XK_space:
         d0 = umbrella.pos[0] - kangaroo.pos[0];
         d1 = umbrella.pos[1] - kangaroo.pos[1];
+        dist = d0*d0+d1*d1;
+        if (dist < (kangaroo.radius*kangaroo.radius)) {
+            if (kangaroo.radius > 20.0) {
+                show_kangaroo ^= 1;
+                high_score += 100;
+            }
+        }
+        break;
 	case XK_w:
 	    if (shift) {
 		//shrink the umbrella
@@ -583,11 +593,11 @@ void move_ufo()
 void physics(void)
 {
     if (show_kangaroo)
-	move_kangaroo();
+        move_kangaroo();
     if (show_rhino)
-	move_rhino();
+        move_rhino();
     if (show_ufo)
-	move_ufo();
+        move_ufo();
 }
 
 #ifdef USE_UMBRELLA
