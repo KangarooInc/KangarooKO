@@ -487,12 +487,21 @@ void check_keys(XEvent *e)
     } else {
         return;
     }
+
+    int i = 0;
     //
     switch(key) {
         case XK_b:
             show_bigfoot ^= 1;
             if (show_bigfoot) {
-                bigfoot.pos[0] = -250.0;
+                bigfoot.pos[0] = 750.0;
+                i = random(3);
+                if (i == 1)
+                    bigfoot.pos[1] = 250.0;
+                else if (i == 2)
+                    bigfoot.pos[1] = 180.0;
+                else
+                    bigfoot.pos[1] = 120.0;
             }
             break;
         case XK_d:
@@ -629,26 +638,32 @@ void delete_rain(Raindrop *node)
 }
 
 void move_bigfoot()
-{
+{   
+    //bigfoot.pos[0] IS THE X AXIS
+    //bigfoot.pos[1] IS THE Y AXIS
+
     //move bigfoot...
     int addgrav = 1;
     //Update position
     bigfoot.pos[0] += bigfoot.vel[0];
-    //	bigfoot.pos[1] += bigfoot.vel[1];
+    bigfoot.pos[1] += bigfoot.vel[1];
     //Check for collision with window edges
     if ((bigfoot.pos[0] < -140.0 && bigfoot.vel[0] < 0.0) ||
             (bigfoot.pos[0] >= (float)xres+140.0 && bigfoot.vel[0] > 0.0)) {
         bigfoot.vel[0] = -bigfoot.vel[0];
         addgrav = 0;
+        bigfoot.pos[0] = 1000.0; //make rhino appear on right
     }
-    /*	if ((bigfoot.pos[1] < 150.0 && bigfoot.vel[1] < 0.0) ||
-        (bigfoot.pos[1] >= (float)yres && bigfoot.vel[1] > 0.0)) {
+
+    if ((bigfoot.pos[1] < 150.0 && bigfoot.vel[1] < 0.0) ||
+            (bigfoot.pos[1] >= (float)yres && bigfoot.vel[1] > 0.0)) {
         bigfoot.vel[1] = -bigfoot.vel[1];
         addgrav = 0;
-        }
-        */	//Gravity
-    if (addgrav)
-        bigfoot.vel[1] -= 0.75;
+    }
+    /*Gravity
+      if (addgrav)
+      bigfoot.vel[1] -= 0.75;
+      */
 }
 
 
