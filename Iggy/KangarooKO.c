@@ -70,26 +70,8 @@ void init_sounds(void);
 void physics(void);
 void render(void);
 
-/*
-//-----------------------------------------------------------------------------
-//Setup timers
-const double physicsRate = 1.0 / 30.0;
-const double oobillion = 1.0 / 1e9;
-struct timespec timeStart, timeCurrent;
-struct timespec timePause;
-double physicsCountdown=0.0;
-double timeSpan=0.0;
-double timeDiff(struct timespec *start, struct timespec *end) {
-    return (double)(end->tv_sec - start->tv_sec ) +
-	(double)(end->tv_nsec - start->tv_nsec) * oobillion;
-}
-void timeCopy(struct timespec *dest, struct timespec *source) {
-    memcpy(dest, source, sizeof(struct timespec));
-}
-//-----------------------------------------------------------------------------*/
 
 int done=0;
-//int xres=800, yres=600;
 
 typedef struct t_kangaroo {
     Vec pos;
@@ -129,6 +111,7 @@ int show_ufo=0;
 int silhouette=1;
 int silhouette1=1;
 int silhouette2=2;
+int high_score=0;    // high score tracker, prints in render()
 #ifdef USE_SOUND
 int play_sounds = 0;
 #endif //USE_SOUND
@@ -188,62 +171,6 @@ int main(void)
     logClose();
     return 0;
 }
-
-/*void cleanupXWindows(void)
-{
-    XDestroyWindow(dpy, win);
-    XCloseDisplay(dpy);
-}
-
-void set_title(void)
-{
-    //Set the window title bar.
-    XMapWindow(dpy, win);
-    XStoreName(dpy, win, "Kangaroo K.O.");
-}
-
-void setup_screen_res(const int w, const int h)
-{
-    xres = w;
-    yres = h;
-}
-
-void initXWindows(void)
-{
-    Window root;
-    GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-    //GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, None };
-    XVisualInfo *vi;
-    Colormap cmap;
-    XSetWindowAttributes swa;
-
-    setup_screen_res(640, 480);
-    dpy = XOpenDisplay(NULL);
-    if(dpy == NULL) {
-	printf("\n\tcannot connect to X server\n\n");
-	exit(EXIT_FAILURE);
-    }
-    root = DefaultRootWindow(dpy);
-    vi = glXChooseVisual(dpy, 0, att);
-    if(vi == NULL) {
-	printf("\n\tno appropriate visual found\n\n");
-	exit(EXIT_FAILURE);
-    } 
-    //else {
-    //	// %p creates hexadecimal output like in glxinfo
-    //	printf("\n\tvisual %p selected\n", (void *)vi->visualid);
-    //}
-    cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
-    swa.colormap = cmap;
-    swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-	StructureNotifyMask | SubstructureNotifyMask;
-    win = XCreateWindow(dpy, root, 0, 0, xres, yres, 0,
-	    vi->depth, InputOutput, vi->visual,
-	    CWColormap | CWEventMask, &swa);
-    set_title();
-    glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
-    glXMakeCurrent(dpy, win, glc);
-}*/
 
 void reshape_window(int width, int height)
 {
@@ -534,11 +461,12 @@ void check_keys(XEvent *e)
 	return;
     }
     //
+    Flt d0,d1;
     switch(key) {
 	case XK_k:
 	    show_kangaroo ^= 1;
 	    if (show_kangaroo) {
-		kangaroo.pos[0] = -250.0;
+		kangaroo.pos[0] = 750.0;
 	    }
 	    break;
 	case XK_r:
@@ -559,8 +487,8 @@ void check_keys(XEvent *e)
 	    break;
 	case XK_u:
 	    show_umbrella ^= 1;
-	    break;
-	case XK_p:
+	    //break;
+	//case XK_p:
 	    umbrella.shape ^= 1;
 	    break;
 	case XK_Left:
@@ -582,6 +510,9 @@ void check_keys(XEvent *e)
 	case XK_n:
 	    play_sounds ^= 1;
 	    break;
+    case XK_space:
+        d0 = umbrella.pos[0] - kangaroo.pos[0];
+        d1 = umbrella.pos[1] - kangaroo.pos[1];
 	case XK_w:
 	    if (shift) {
 		//shrink the umbrella
@@ -836,5 +767,6 @@ void render(void)
     ggprint8b(&r, 16, cref, "D - Deflection");
     ggprint8b(&r, 16, cref, "N - Sounds");
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
+    ggprint8b(&r, 16, cref, "High Score:%i", high_score);
 }
 
