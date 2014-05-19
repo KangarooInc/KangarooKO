@@ -464,7 +464,6 @@ void check_keys(XEvent *e)
         return;
     }
 
-    //Flt d0, d1, dist;
 
     Flt punch_dist, hit_dist;
     switch(key) {
@@ -507,17 +506,6 @@ void check_keys(XEvent *e)
             play_sounds ^= 1;
             break;
         case XK_space:
-            //d0 = kangaroo.pos[0] - rhino.pos[0];
-            //d1 = kangaroo.pos[1] - rhino.pos[1];
-            //dist = d0*d0+d1*d1;
-            /*if (dist < (rhino.radius * rhino.radius)) {
-                if (rhino.radius > 20.0) {
-                    if (show_rhino) {
-                        rhinoReset();
-                    } 
-                    high_score += 100;
-                }
-            }*/
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
@@ -756,6 +744,7 @@ void render(void)
     ggprint8b(&r, 16, cref, "R - Rhino");
     ggprint8b(&r, 16, cref, "N - Sounds");
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
+    ggprint8b(&r, 16, cref, "Lives: %i", lives);
     ggprint8b(&r, 16, cref, "High Score:%i", high_score);
 }
 
