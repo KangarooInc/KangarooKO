@@ -77,7 +77,8 @@ int done=0;
 typedef struct t_rhino {
     Vec pos;
     Vec vel;
-    Flt radius;
+    float height;
+    float height2;
 } Rhino;
 Rhino rhino;
 
@@ -87,11 +88,11 @@ typedef struct t_ufo {
 } Ufo;
 Ufo ufo;
 
-Ppmimage *kangarooImage=NULL;
-Ppmimage *backgroundImage=NULL;
-Ppmimage *startImage=NULL;
-Ppmimage *rhinoImage=NULL;
-Ppmimage *ufoImage=NULL;
+Ppmimage *kangarooImage = NULL;
+Ppmimage *backgroundImage = NULL;
+Ppmimage *startImage = NULL;
+Ppmimage *rhinoImage = NULL;
+Ppmimage *ufoImage = NULL;
 GLuint kangarooTexture;
 GLuint rhinoTexture;
 GLuint ufoTexture;
@@ -100,15 +101,16 @@ GLuint silhouetteTexture1;
 GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
-int show_kangaroo=1;
-int background=1;
-int start=1;
-int show_rhino=0;
-int show_ufo=0;
-int silhouette=1;
-int silhouette1=1;
-int silhouette2=2;
-int high_score=0;    // high score tracker, prints in render()
+int show_kangaroo = 1;
+int background = 1;
+int start = 1;
+int show_rhino = 0;
+int show_ufo = 0;
+int silhouette = 1;
+int silhouette1 = 1;
+int silhouette2 = 2;
+int high_score = 0;    // high score tracker, prints in render()
+int lives = 3;
 #ifdef USE_SOUND
 int play_sounds = 0;
 #endif //USE_SOUND
@@ -122,7 +124,8 @@ typedef struct t_kangaroo {
     Vec lastpos;
     float width;
     float width2;
-    float radius;
+    float height;
+    float height2;
 } Kangaroo;
 Kangaroo kangaroo;
 int deflection=0;
@@ -384,13 +387,12 @@ void init() {
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
-    kangaroo.radius = (float)kangaroo.width2;
+    kangaroo.height = 100.0;
+    kangaroo.height2 = kangaroo.height * 0.5;
     kangaroo.shape = 1;
 #endif //USE_UMBRELLA
     MakeVector(150.0,180.0,0.0, rhino.pos);
     MakeVector(-6.0,0.0,0.0, rhino.vel);
-    //rhino.radius = (8.0 + rnd() * 100);
-    rhino.radius = (50);
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
@@ -455,7 +457,8 @@ void check_keys(XEvent *e)
         return;
     }
 
-    Flt d0, d1, dist;
+   // Flt d0, d1, dist;
+    Flt punch_dist, hit_dist;
 
     switch(key) {
         case XK_Return:
@@ -497,29 +500,18 @@ void check_keys(XEvent *e)
             play_sounds ^= 1;
             break;
         case XK_space:
-            d0 = kangaroo.pos[0] - rhino.pos[0];
-            d1 = kangaroo.pos[1] - rhino.pos[1];
-            dist = d0*d0+d1*d1;
-            if (dist < (rhino.radius * rhino.radius)) {
-                if (rhino.radius > 20.0) {
-                    if (show_rhino) {
+            punch_dist = kangaroo.pos[0] + kangaroo.height2;
+            hit_dist = rhino.pos[0] - rhino.height2;
+            if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
+                    && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
+                if ((hit_dist - punch_dist) >= 0) {
                         rhinoReset();
-                    } 
                     high_score += 100;
                 }
+                else {
+                    lives--;
+                }
             }
-            break;
-        case XK_w:
-            if (shift) {
-                //shrink the kangaroo
-                kangaroo.width *= (1.0 / 1.05);
-            } else {
-                //enlarge the kangaroo
-                kangaroo.width *= 1.05;
-            }
-            //half the width
-            kangaroo.width2 = kangaroo.width * 0.5;
-            kangaroo.radius = (float)kangaroo.width2;
             break;
         case XK_Escape:
             done=1;
@@ -732,6 +724,7 @@ void render(void)
     ggprint8b(&r, 16, cref, "R - Rhino");
     ggprint8b(&r, 16, cref, "N - Sounds");
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
+    ggprint8b(&r, 16, cref, "Lives: %i", lives);
     ggprint8b(&r, 16, cref, "High Score:%i", high_score);
 }
 
