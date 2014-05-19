@@ -89,7 +89,6 @@ Ufo ufo;
 
 Ppmimage *kangarooImage=NULL;
 Ppmimage *backgroundImage=NULL;
-Ppmimage *startImage=NULL;
 Ppmimage *rhinoImage=NULL;
 Ppmimage *ufoImage=NULL;
 GLuint kangarooTexture;
@@ -99,10 +98,8 @@ GLuint silhouetteTexture;
 GLuint silhouetteTexture1;
 GLuint silhouetteTexture2;
 GLuint backgroundTexture;
-GLuint startTexture;
 int show_kangaroo=1;
 int background=1;
-int start=1;
 int show_rhino=0;
 int show_ufo=0;
 int silhouette=1;
@@ -243,21 +240,20 @@ void init_opengl(void)
     //
     kangarooImage    = ppm6GetImage("./images/ricky.ppm");
     backgroundImage  = ppm6GetImage("./images/background.ppm");
-    startImage       = ppm6GetImage("./images/start.ppm");
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
-    ufoImage	     = ppm6GetImage("./images/ufo.ppm");
+    ufoImage	 = ppm6GetImage("./images/ufo.ppm");
     //
     //create opengl texture elements
     glGenTextures(1, &silhouetteTexture1);
     glGenTextures(1, &silhouetteTexture2);
     glGenTextures(1, &backgroundTexture);
-    glGenTextures(1, &startTexture);
     glGenTextures(1, &rhinoTexture);
 
 
     //-------------------------------------------------------------------------
     //
-    // Rhino
+    //rhino
+    //
     int w1 = rhinoImage->width;
     int h1 = rhinoImage->height;
 
@@ -280,7 +276,7 @@ void init_opengl(void)
     free(silhouetteData1);
     //
     //-------------------------------------------------------------------------
-    // UFO Spaceship
+    //ufo spaceship
     int w2 = ufoImage->width;
     int h2 = ufoImage->height;
 
@@ -303,7 +299,7 @@ void init_opengl(void)
     free(silhouetteData2);
     //
     //-------------------------------------------------------------------------
-    // Kangaroo
+    //Kangaroo
     //
     int w = kangarooImage->width;
     int h = kangarooImage->height;
@@ -320,18 +316,7 @@ void init_opengl(void)
     free(silhouetteData);
     //-------------------------------------------------------------------------
     //
-    // Start Page
-    glBindTexture(GL_TEXTURE_2D, startTexture);
-    //
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            startImage->width, startImage->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, startImage->data);
-    //-------------------------------------------------------------------------
-    //-------------------------------------------------------------------------
-    //
-    // Background
+    //background
     glBindTexture(GL_TEXTURE_2D, backgroundTexture);
     //
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
@@ -424,7 +409,7 @@ void check_mouse(XEvent *e)
 void rhinoReset(void)
 {
     int i = random(4);
-
+    
     rhino.pos[0] = 750.0;
     if (i == 1)
         rhino.pos[1] = 250.0;
@@ -458,9 +443,6 @@ void check_keys(XEvent *e)
     Flt d0, d1, dist;
 
     switch(key) {
-        case XK_Return:
-            start = 0;
-            break;
         case XK_r:
             show_rhino ^= 1;
             if (show_rhino) {
@@ -469,6 +451,9 @@ void check_keys(XEvent *e)
             break;
         case XK_a:
             show_ufo ^= 1;
+            break;
+        case XK_d:
+            deflection ^= 1;
             break;
         case XK_s:
             silhouette ^= 1;
@@ -584,22 +569,22 @@ void physics(void)
 void draw_kangaroo(void)
 {
     //Log("draw_kangaroo()...\n");
-    glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-    glPushMatrix();
-    glTranslatef(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glBindTexture(GL_TEXTURE_2D, kangarooTexture);
-    glBegin(GL_QUADS);
-    float w = kangaroo.width2;
-    glTexCoord2f(0.0f, 0.0f); glVertex2f(-w,  w);
-    glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  w);
-    glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -w);
-    glTexCoord2f(0.0f, 1.0f); glVertex2f(-w, -w);
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_ALPHA_TEST);
-    glPopMatrix();
+        glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+        glPushMatrix();
+        glTranslatef(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, kangarooTexture);
+        glBegin(GL_QUADS);
+        float w = kangaroo.width2;
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(-w,  w);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  w);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -w);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(-w, -w);
+        glEnd();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_ALPHA_TEST);
+        glPopMatrix();
 }
 #endif //USE_UMBRELLA
 
@@ -607,12 +592,10 @@ void render(void)
 {
     Rect r;
     static double yOFFset = 0.0;
-    if(start == 0)
-    {
-        yOFFset -= 1;
-        if(yOFFset>100.0)
-            yOFFset -=100.0;
-    }
+    yOFFset -= 0.01;
+    if(yOFFset>100.0)
+        yOFFset -=100.0;
+
     //Clear the screen
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -622,23 +605,10 @@ void render(void)
     //draw a quad with texture
     float wid = 120.0f;
     glColor3f(1.0, 1.0, 1.0);
-
-
     if (background) {
         glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, backgroundTexture);
         glTranslatef(yOFFset, 0.0f, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
-        glEnd();
-        glPopMatrix();
-    }
-    if (start) {
-        glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, startTexture);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
         glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
@@ -727,9 +697,11 @@ void render(void)
     r.left = 10;
     r.center = 0;
     unsigned int cref = 0x00ffffff;
+    ggprint8b(&r, 16, cref, "B - Background");
     ggprint8b(&r, 16, cref, "S - Silhouette");
     ggprint8b(&r, 16, cref, "K - Kangaroo");
     ggprint8b(&r, 16, cref, "R - Rhino");
+    ggprint8b(&r, 16, cref, "D - Deflection");
     ggprint8b(&r, 16, cref, "N - Sounds");
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
     ggprint8b(&r, 16, cref, "High Score:%i", high_score);
