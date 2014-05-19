@@ -77,6 +77,10 @@ int done=0;
 typedef struct t_rhino {
     Vec pos;
     Vec vel;
+<<<<<<< HEAD
+=======
+    Flt radius;
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
     float height;
     float height2;
 } Rhino;
@@ -101,6 +105,7 @@ GLuint silhouetteTexture1;
 GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
+<<<<<<< HEAD
 int show_kangaroo = 1;
 int background = 1;
 int start = 1;
@@ -111,6 +116,18 @@ int silhouette1 = 1;
 int silhouette2 = 2;
 int high_score = 0;    // high score tracker, prints in render()
 int lives = 3;
+=======
+int show_kangaroo=1;
+int background=1;
+int start=1;
+int show_rhino=0;
+int show_ufo=0;
+int silhouette=1;
+int silhouette1=1;
+int silhouette2=2;
+int high_score=0;    // high score tracker, prints in render()
+int lives=3;
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 #ifdef USE_SOUND
 int play_sounds = 0;
 #endif //USE_SOUND
@@ -126,6 +143,10 @@ typedef struct t_kangaroo {
     float width2;
     float height;
     float height2;
+<<<<<<< HEAD
+=======
+    float radius;
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 } Kangaroo;
 Kangaroo kangaroo;
 int deflection=0;
@@ -387,12 +408,25 @@ void init() {
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
+<<<<<<< HEAD
     kangaroo.height = 100.0;
     kangaroo.height2 = kangaroo.height * 0.5;
+=======
+    kangaroo.height = 200.0;
+    kangaroo.height2 = kangaroo.height * 0.5;
+    kangaroo.radius = (float)kangaroo.width2;
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
     kangaroo.shape = 1;
 #endif //USE_UMBRELLA
     MakeVector(150.0,180.0,0.0, rhino.pos);
     MakeVector(-6.0,0.0,0.0, rhino.vel);
+<<<<<<< HEAD
+=======
+    //rhino.radius = (8.0 + rnd() * 100);
+    rhino.radius = (50);
+    rhino.height = 200.0;
+    rhino.height2 = rhino.height * 0.5;
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
@@ -457,9 +491,13 @@ void check_keys(XEvent *e)
         return;
     }
 
+<<<<<<< HEAD
    // Flt d0, d1, dist;
     Flt punch_dist, hit_dist;
+=======
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 
+    Flt punch_dist, hit_dist;
     switch(key) {
         case XK_Return:
             start = 0;
@@ -505,7 +543,13 @@ void check_keys(XEvent *e)
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
                 if ((hit_dist - punch_dist) >= 0) {
+<<<<<<< HEAD
                         rhinoReset();
+=======
+                    if (show_rhino) {
+                        rhinoReset();
+                    }
+>>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
                     high_score += 100;
                 }
                 else {
