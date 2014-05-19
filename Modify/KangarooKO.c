@@ -37,14 +37,14 @@
 //defined types
 typedef double Flt;
 typedef double Vec[3];
-typedef Flt	Matrix[4][4];
+typedef Flt Matrix[4][4];
 
 //macros
 #define rnd() (((double)rand())/(double)RAND_MAX)
 #define random(a) (rand()%a)
 #define MakeVector(x, y, z, v) (v)[0]=(x),(v)[1]=(y),(v)[2]=(z)
 #define VecCopy(a,b) (b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2]
-#define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
+#define VecDot(a,b) ((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
                              (c)[1]=(a)[1]-(b)[1]; \
 (c)[2]=(a)[2]-(b)[2]
@@ -77,10 +77,6 @@ int done=0;
 typedef struct t_rhino {
     Vec pos;
     Vec vel;
-<<<<<<< HEAD
-=======
-    Flt radius;
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
     float height;
     float height2;
 } Rhino;
@@ -105,7 +101,6 @@ GLuint silhouetteTexture1;
 GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
-<<<<<<< HEAD
 int show_kangaroo = 1;
 int background = 1;
 int start = 1;
@@ -116,18 +111,6 @@ int silhouette1 = 1;
 int silhouette2 = 2;
 int high_score = 0;    // high score tracker, prints in render()
 int lives = 3;
-=======
-int show_kangaroo=1;
-int background=1;
-int start=1;
-int show_rhino=0;
-int show_ufo=0;
-int silhouette=1;
-int silhouette1=1;
-int silhouette2=2;
-int high_score=0;    // high score tracker, prints in render()
-int lives=3;
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 #ifdef USE_SOUND
 int play_sounds = 0;
 #endif //USE_SOUND
@@ -143,10 +126,6 @@ typedef struct t_kangaroo {
     float width2;
     float height;
     float height2;
-<<<<<<< HEAD
-=======
-    float radius;
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 } Kangaroo;
 Kangaroo kangaroo;
 int deflection=0;
@@ -224,9 +203,9 @@ unsigned char *buildAlphaData(Ppmimage *img)
         //original code
         //get largest color component...
         //*(ptr+3) = (unsigned char)((
-        //		(int)*(ptr+0) +
-        //		(int)*(ptr+1) +
-        //		(int)*(ptr+2)) / 3);
+        //      (int)*(ptr+0) +
+        //      (int)*(ptr+1) +
+        //      (int)*(ptr+2)) / 3);
         //d = a;
         //if (b >= a && b >= c) d = b;
         //if (c >= a && c >= b) d = c;
@@ -269,7 +248,7 @@ void init_opengl(void)
     backgroundImage  = ppm6GetImage("./images/background.ppm");
     startImage       = ppm6GetImage("./images/start.ppm");
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
-    ufoImage	     = ppm6GetImage("./images/ufo.ppm");
+    ufoImage         = ppm6GetImage("./images/ufo.ppm");
     //
     //create opengl texture elements
     glGenTextures(1, &silhouetteTexture1);
@@ -298,7 +277,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *silhouetteData1 = buildAlphaData(rhinoImage);	
+    unsigned char *silhouetteData1 = buildAlphaData(rhinoImage);    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w1, h1, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData1);
     free(silhouetteData1);
@@ -321,7 +300,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *silhouetteData2 = buildAlphaData(ufoImage);	
+    unsigned char *silhouetteData2 = buildAlphaData(ufoImage);  
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData2);
     free(silhouetteData2);
@@ -338,7 +317,7 @@ void init_opengl(void)
     //
     //must build a new set of data...
 
-    unsigned char *silhouetteData = buildAlphaData(kangarooImage);	
+    unsigned char *silhouetteData = buildAlphaData(kangarooImage);  
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
     free(silhouetteData);
@@ -408,25 +387,12 @@ void init() {
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
-<<<<<<< HEAD
     kangaroo.height = 100.0;
     kangaroo.height2 = kangaroo.height * 0.5;
-=======
-    kangaroo.height = 200.0;
-    kangaroo.height2 = kangaroo.height * 0.5;
-    kangaroo.radius = (float)kangaroo.width2;
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
     kangaroo.shape = 1;
 #endif //USE_UMBRELLA
     MakeVector(150.0,180.0,0.0, rhino.pos);
     MakeVector(-6.0,0.0,0.0, rhino.vel);
-<<<<<<< HEAD
-=======
-    //rhino.radius = (8.0 + rnd() * 100);
-    rhino.radius = (50);
-    rhino.height = 200.0;
-    rhino.height2 = rhino.height * 0.5;
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
@@ -491,13 +457,9 @@ void check_keys(XEvent *e)
         return;
     }
 
-<<<<<<< HEAD
    // Flt d0, d1, dist;
     Flt punch_dist, hit_dist;
-=======
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
 
-    Flt punch_dist, hit_dist;
     switch(key) {
         case XK_Return:
             start = 0;
@@ -543,13 +505,7 @@ void check_keys(XEvent *e)
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
                 if ((hit_dist - punch_dist) >= 0) {
-<<<<<<< HEAD
                         rhinoReset();
-=======
-                    if (show_rhino) {
-                        rhinoReset();
-                    }
->>>>>>> de9f01c1d46e9b2b167992f434918e148d3908ea
                     high_score += 100;
                 }
                 else {
@@ -741,10 +697,10 @@ void render(void)
     glDisable(GL_TEXTURE_2D);
     //glColor3f(1.0f, 0.0f, 0.0f);
     //glBegin(GL_QUADS);
-    //	glVertex2i(10,10);
-    //	glVertex2i(10,60);
-    //	glVertex2i(60,60);
-    //	glVertex2i(60,10);
+    //  glVertex2i(10,10);
+    //  glVertex2i(10,60);
+    //  glVertex2i(60,60);
+    //  glVertex2i(60,10);
     //glEnd();
     //return;
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
