@@ -78,6 +78,8 @@ typedef struct t_rhino {
     Vec pos;
     Vec vel;
     Flt radius;
+    float height;
+    float height2;
 } Rhino;
 Rhino rhino;
 
@@ -109,6 +111,7 @@ int silhouette=1;
 int silhouette1=1;
 int silhouette2=2;
 int high_score=0;    // high score tracker, prints in render()
+int lives=3;
 #ifdef USE_SOUND
 int play_sounds = 0;
 #endif //USE_SOUND
@@ -122,6 +125,8 @@ typedef struct t_kangaroo {
     Vec lastpos;
     float width;
     float width2;
+    float height;
+    float height2;
     float radius;
 } Kangaroo;
 Kangaroo kangaroo;
@@ -384,6 +389,8 @@ void init() {
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
+    kangaroo.height = 200.0;
+    kangaroo.height2 = kangaroo.height * 0.5;
     kangaroo.radius = (float)kangaroo.width2;
     kangaroo.shape = 1;
 #endif //USE_UMBRELLA
@@ -391,6 +398,8 @@ void init() {
     MakeVector(-6.0,0.0,0.0, rhino.vel);
     //rhino.radius = (8.0 + rnd() * 100);
     rhino.radius = (50);
+    rhino.height = 200.0;
+    rhino.height2 = rhino.height * 0.5;
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
@@ -455,8 +464,9 @@ void check_keys(XEvent *e)
         return;
     }
 
-    Flt d0, d1, dist;
+    //Flt d0, d1, dist;
 
+    Flt punch_dist, hit_dist;
     switch(key) {
         case XK_Return:
             start = 0;
@@ -497,15 +507,29 @@ void check_keys(XEvent *e)
             play_sounds ^= 1;
             break;
         case XK_space:
-            d0 = kangaroo.pos[0] - rhino.pos[0];
-            d1 = kangaroo.pos[1] - rhino.pos[1];
-            dist = d0*d0+d1*d1;
-            if (dist < (rhino.radius * rhino.radius)) {
+            //d0 = kangaroo.pos[0] - rhino.pos[0];
+            //d1 = kangaroo.pos[1] - rhino.pos[1];
+            //dist = d0*d0+d1*d1;
+            /*if (dist < (rhino.radius * rhino.radius)) {
                 if (rhino.radius > 20.0) {
                     if (show_rhino) {
                         rhinoReset();
                     } 
                     high_score += 100;
+                }
+            }*/
+            punch_dist = kangaroo.pos[0] + kangaroo.height2;
+            hit_dist = rhino.pos[0] - rhino.height2;
+            if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
+                    && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
+                if ((hit_dist - punch_dist) >= 0) {
+                    if (show_rhino) {
+                        rhinoReset();
+                    }
+                    high_score += 100;
+                }
+                else {
+                    lives--;
                 }
             }
             break;
