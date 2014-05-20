@@ -25,6 +25,7 @@
 #include "fonts.h"
 #include "timing.h"
 #include "xwin.h"
+#include "gameover.h"
 
 #define USE_SOUND
 
@@ -94,6 +95,7 @@ Ppmimage *backgroundImage=NULL;
 Ppmimage *startImage=NULL;
 Ppmimage *rhinoImage=NULL;
 Ppmimage *ufoImage=NULL;
+Ppmimage *gameoverImage=NULL; //------------------------------------------------
 GLuint kangarooTexture;
 GLuint rhinoTexture;
 GLuint ufoTexture;
@@ -102,9 +104,11 @@ GLuint silhouetteTexture1;
 GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
+GLuint gameoverTexture; //-------------------------------------------------
 int show_kangaroo=1;
 int background=1;
 int start=1;
+int gameover=0; //--------------------------------------------------------
 int show_rhino=0;
 int show_ufo=0;
 int silhouette=1;
@@ -249,6 +253,7 @@ void init_opengl(void)
     kangarooImage    = ppm6GetImage("./images/ricky.ppm");
     backgroundImage  = ppm6GetImage("./images/background.ppm");
     startImage       = ppm6GetImage("./images/start.ppm");
+    gameoverImage    = ppm6GetImage("./images/gameover.ppm"); //-------------------------------------------------------
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
     ufoImage	     = ppm6GetImage("./images/ufo.ppm");
     //
@@ -258,6 +263,7 @@ void init_opengl(void)
     glGenTextures(1, &backgroundTexture);
     glGenTextures(1, &startTexture);
     glGenTextures(1, &rhinoTexture);
+    glGenTextures(1, &gameoverTexture); //-----------------------------------------------------------------
 
 
     //-------------------------------------------------------------------------
@@ -344,6 +350,15 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
             backgroundImage->width, backgroundImage->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, backgroundImage->data);
+    //-------------------------------------------------------------------------
+    // gameover
+    glBindTexture(GL_TEXTURE_2D, gameoverTexture);
+    //
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+            gameoverImage->width, gameoverImage->height,
+            0, GL_RGB, GL_UNSIGNED_BYTE, gameoverImage->data);
     //-------------------------------------------------------------------------
 }
 
@@ -621,7 +636,7 @@ void render(void)
     static double yOFFset = 0.0;
     if(start == 0)
     {
-        yOFFset -= 1;
+        yOFFset -= 0.01;
         if(yOFFset>100.0)
             yOFFset -=100.0;
     }
@@ -643,8 +658,8 @@ void render(void)
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
         glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(xres*20, yres);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(xres*20, 0);
         glEnd();
         glPopMatrix();
     }
@@ -658,6 +673,9 @@ void render(void)
         glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
         glEnd();
         glPopMatrix();
+    }
+    if (lives <= 0) {
+        GameOver();
     }
     if (show_rhino) {
         glPushMatrix();
