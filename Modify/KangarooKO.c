@@ -426,7 +426,6 @@ void check_mouse(XEvent *e)
 void rhinoReset(void)
 {
     int i = random(4);
-
     rhino.pos[0] = 750.0;
     if (i == 1)
         rhino.pos[1] = 250.0;
