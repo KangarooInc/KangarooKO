@@ -32,7 +32,7 @@ void set_title(void)
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "CS335 - Lab2_rainforest");
+	XStoreName(dpy, win, "KangarooKO");
 }
 
 void setup_screen_res(const int w, const int h)

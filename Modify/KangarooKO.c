@@ -449,7 +449,7 @@ void rhinoReset(void)
 {
     int i = random(4);
 
-    rhino.pos[0] = 750.0;
+    rhino.pos[0] = (float)xres + 100.0;
     if (i == 1)
         rhino.pos[1] = 250.0;
     else if (i == 2)
@@ -502,15 +502,15 @@ void check_keys(XEvent *e)
             show_kangaroo ^= 1;
             break;
         case XK_Left:
-            if (!(kangaroo.pos[0] - kangaroo.width2 < -140.0)) {
+            if (!(kangaroo.pos[0] - kangaroo.width2 < -80.0)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[0] -= 10.0;
+                kangaroo.pos[0] -= 20.0;
             }
             break;
         case XK_Right:
             if (!(kangaroo.pos[0] + kangaroo.width2 >= (float)xres)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[0] += 10.0;
+                kangaroo.pos[0] += 20.0;
             }
             break;
         case XK_Up:
@@ -590,9 +590,6 @@ void move_rhino()
         rhino.pos[0] = 1000.0; //make rhino appear on right
         //addgrav = 0;
     }
-    if ((kangaroo.pos[0] - rhino.pos[0]) == 0) {
-        lives--;
-    }
     if ((rhino.pos[1] < 150.0 && rhino.vel[1] < 0.0) ||
             (rhino.pos[1] >= (float)yres && rhino.vel[1] > 0.0)) {
         rhino.vel[1] = -rhino.vel[1];
@@ -614,6 +611,10 @@ void physics(void)
         move_rhino();
     if (show_ufo)
         move_ufo();
+
+    if ((kangaroo.pos[0] - rhino.pos[0]) == 0) {
+        lives--;
+    }
 }
 
 #ifdef USE_UMBRELLA
