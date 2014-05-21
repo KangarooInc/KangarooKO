@@ -49,6 +49,7 @@ typedef Flt	Matrix[4][4];
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
                              (c)[1]=(a)[1]-(b)[1]; \
 (c)[2]=(a)[2]-(b)[2]
+
 //constants
 const float timeslice = 1.0f;
 const float gravity = -0.2f;
@@ -72,13 +73,9 @@ void physics(void);
 void render(void);
 void rhinoReset(void);
 
-
-int done=0;
-
 typedef struct t_rhino {
     Vec pos;
     Vec vel;
-    Flt radius;
     float height;
     float height2;
 } Rhino;
@@ -89,6 +86,22 @@ typedef struct t_ufo {
     Vec vel;
 } Ufo;
 Ufo ufo;
+
+#define USE_KANGAROO
+#ifdef USE_KANGAROO
+typedef struct t_kangaroo {
+    int shape;
+    Vec pos;
+    Vec lastpos;
+    float width;
+    float width2;
+    float height;
+    float height2;
+} Kangaroo;
+Kangaroo kangaroo;
+int deflection=0;
+#endif //USE_KANGAROO
+
 
 Ppmimage *kangarooImage=NULL;
 Ppmimage *backgroundImage=NULL;
@@ -105,6 +118,7 @@ GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
 GLuint gameoverTexture; //-------------------------------------------------
+int done=0;
 int show_kangaroo=1;
 int background=1;
 int start=1;
@@ -120,22 +134,6 @@ int lives=3;
 int play_sounds = 0;
 #endif //USE_SOUND
 //
-//
-#define USE_UMBRELLA
-#ifdef USE_UMBRELLA
-typedef struct t_kangaroo {
-    int shape;
-    Vec pos;
-    Vec lastpos;
-    float width;
-    float width2;
-    float height;
-    float height2;
-    float radius;
-} Kangaroo;
-Kangaroo kangaroo;
-int deflection=0;
-#endif //USE_UMBRELLA
 
 
 int main(void)
@@ -186,6 +184,7 @@ void reshape_window(int width, int height)
     glOrtho(0, xres, 0, yres, -1, 1);
     set_title();
 }
+
 
 unsigned char *buildAlphaData(Ppmimage *img)
 {
@@ -351,7 +350,7 @@ void init_opengl(void)
             backgroundImage->width, backgroundImage->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, backgroundImage->data);
     //-------------------------------------------------------------------------
-    // gameover
+    // Gameover
     glBindTexture(GL_TEXTURE_2D, gameoverTexture);
     //
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
@@ -398,21 +397,18 @@ void init_sounds(void)
 }
 
 void init() {
-#ifdef USE_UMBRELLA
+#ifdef USE_KANGAROO
     kangaroo.pos[0] = 100.0;
     kangaroo.pos[1] = (double)(yres-225);
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
-    kangaroo.height = 200.0;
+    kangaroo.height = 100.0;
     kangaroo.height2 = kangaroo.height * 0.5;
-    kangaroo.radius = (float)kangaroo.width2;
     kangaroo.shape = 1;
-#endif //USE_UMBRELLA
+#endif //USE_KANGAROO
     MakeVector(150.0,180.0,0.0, rhino.pos);
     MakeVector(-6.0,0.0,0.0, rhino.vel);
-    //rhino.radius = (8.0 + rnd() * 100);
-    rhino.radius = (50);
     rhino.height = 200.0;
     rhino.height2 = rhino.height * 0.5;
 
@@ -536,18 +532,6 @@ void check_keys(XEvent *e)
                 }
             }
             break;
-        case XK_w:
-            if (shift) {
-                //shrink the kangaroo
-                kangaroo.width *= (1.0 / 1.05);
-            } else {
-                //enlarge the kangaroo
-                kangaroo.width *= 1.05;
-            }
-            //half the width
-            kangaroo.width2 = kangaroo.width * 0.5;
-            kangaroo.radius = (float)kangaroo.width2;
-            break;
         case XK_Escape:
             done=1;
             break;
@@ -607,7 +591,7 @@ void physics(void)
         move_ufo();
 }
 
-#ifdef USE_UMBRELLA
+#ifdef USE_KANGAROO
 void draw_kangaroo(void)
 {
     //Log("draw_kangaroo()...\n");
@@ -628,7 +612,7 @@ void draw_kangaroo(void)
     glDisable(GL_ALPHA_TEST);
     glPopMatrix();
 }
-#endif //USE_UMBRELLA
+#endif //USE_KANGAROO
 
 void render(void)
 {
@@ -746,10 +730,10 @@ void render(void)
     glDisable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     //
-#ifdef USE_UMBRELLA
+#ifdef USE_KANGAROO
     if (show_kangaroo)
         draw_kangaroo();
-#endif //USE_UMBRELLA
+#endif //USE_KANGAROO
     glBindTexture(GL_TEXTURE_2D, 0);
     //
     //
