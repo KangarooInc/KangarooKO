@@ -5,6 +5,8 @@
 
 Ppmimage *gameoverImage;
 extern GLuint gameoverTexture;
+extern int show_kangaroo;
+extern int show_rhino;
 
 extern void GameOver(void);
 

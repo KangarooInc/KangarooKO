@@ -763,6 +763,8 @@ void render(void)
     glBindTexture(GL_TEXTURE_2D, 0);
     //
     //
+    //
+    if(!(show_rhino == 0 && show_kangaroo == 0)) {
     r.bot = yres - 20;
     r.left = 10;
     r.center = 0;
@@ -774,5 +776,6 @@ void render(void)
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
     ggprint8b(&r, 16, cref, "Lives: %i", lives);
     ggprint8b(&r, 16, cref, "High Score:%i", high_score);
+    }
 }
 
