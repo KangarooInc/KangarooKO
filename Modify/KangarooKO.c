@@ -404,7 +404,7 @@ void init() {
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
-    kangaroo.height = 200.0;
+    kangaroo.height = 100.0;
     kangaroo.height2 = kangaroo.height * 0.5;
     kangaroo.radius = (float)kangaroo.width2;
     kangaroo.shape = 1;
@@ -502,20 +502,28 @@ void check_keys(XEvent *e)
             show_kangaroo ^= 1;
             break;
         case XK_Left:
-            VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] -= 10.0;
+            if (!(kangaroo.pos[0] - kangaroo.width2 < -140.0)) {
+                VecCopy(kangaroo.pos, kangaroo.lastpos);
+                kangaroo.pos[0] -= 10.0;
+            }
             break;
         case XK_Right:
-            VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] += 10.0;
+            if (!(kangaroo.pos[0] + kangaroo.width2 >= (float)xres)) {
+                VecCopy(kangaroo.pos, kangaroo.lastpos);
+                kangaroo.pos[0] += 10.0;
+            }
             break;
         case XK_Up:
-            VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[1] += 65.0;
+            if (!(kangaroo.pos[1] >= (float)yres)) {
+                VecCopy(kangaroo.pos, kangaroo.lastpos);
+                kangaroo.pos[1] += 65.0;
+            }
             break;
         case XK_Down:
-            VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[1] -= 65.0;
+            if (!(kangaroo.pos[1] < 100.0)) {
+                VecCopy(kangaroo.pos, kangaroo.lastpos);
+                kangaroo.pos[1] -= 65.0;
+            }
             break;
         case XK_n:
             play_sounds ^= 1;
@@ -525,14 +533,12 @@ void check_keys(XEvent *e)
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 0) {
+                if ((hit_dist - punch_dist) >= 0
+                        && (hit_dist - punch_dist <= 100.0)) {
                     if (show_rhino) {
                         rhinoReset();
                     }
                     high_score += 100;
-                }
-                else {
-                    lives--;
                 }
             }
             break;
@@ -583,6 +589,9 @@ void move_rhino()
         rhino.vel[0] = -rhino.vel[0];
         rhino.pos[0] = 1000.0; //make rhino appear on right
         //addgrav = 0;
+    }
+    if ((kangaroo.pos[0] - rhino.pos[0]) == 0) {
+        lives--;
     }
     if ((rhino.pos[1] < 150.0 && rhino.vel[1] < 0.0) ||
             (rhino.pos[1] >= (float)yres && rhino.vel[1] > 0.0)) {
