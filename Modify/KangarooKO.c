@@ -26,6 +26,7 @@
 #include "timing.h"
 #include "xwin.h"
 #include "gameover.h"
+#include "startmenu.h"
 
 #define USE_SOUND
 
@@ -102,7 +103,6 @@ Kangaroo kangaroo;
 int deflection=0;
 #endif //USE_KANGAROO
 
-
 Ppmimage *kangarooImage=NULL;
 Ppmimage *backgroundImage=NULL;
 Ppmimage *startImage=NULL;
@@ -118,7 +118,6 @@ GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
 GLuint gameoverTexture; //-------------------------------------------------
-int done=0;
 int show_kangaroo=1;
 int background=1;
 int start=1;
@@ -135,13 +134,13 @@ int play_sounds = 0;
 #endif //USE_SOUND
 //
 
-
 int main(void)
 {
     logOpen();
     initXWindows();
     init_opengl();
     init();
+ buttonsInit();
     init_sounds();
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
@@ -414,31 +413,6 @@ void init() {
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
-}
-
-void check_mouse(XEvent *e)
-{
-    //Did the mouse move?
-    //Was a mouse button clicked?
-    static int savex = 0;
-    static int savey = 0;
-    //
-    if (e->type == ButtonRelease) {
-        return;
-    }
-    if (e->type == ButtonPress) {
-        if (e->xbutton.button==1) {
-            //Left button is down
-        }
-        if (e->xbutton.button==3) {
-            //Right button is down
-        }
-    }
-    if (savex != e->xbutton.x || savey != e->xbutton.y) {
-        //Mouse moved
-        savex = e->xbutton.x;
-        savey = e->xbutton.y;
-    }
 }
 
 void rhinoReset(void)
@@ -748,5 +722,43 @@ void render(void)
     ggprint8b(&r, 16, cref, "A - Alien Abduction");
     ggprint8b(&r, 16, cref, "Lives: %i", lives);
     ggprint8b(&r, 16, cref, "High Score:%i", high_score);
+
+    //FOR THE BUTTONS
+    int i;
+    for (i=0; i<nbuttons; i++) {
+        if (button[i].over) {
+            glColor3f(1.0f, 0.0f, 0.0f);
+            //draw a highlight around button
+            glLineWidth(2);
+            glBegin(GL_LINE_LOOP);
+            glVertex2i(button[i].r.left-2,  button[i].r.bot-2);
+            glVertex2i(button[i].r.left-2,  button[i].r.top+2);
+            glVertex2i(button[i].r.right+2, button[i].r.top+2);
+            glVertex2i(button[i].r.right+2, button[i].r.bot-2);
+            glVertex2i(button[i].r.left-2,  button[i].r.bot-2);
+            glEnd();
+            glLineWidth(1);
+        }
+        if (button[i].down) {
+            glColor3fv(button[i].dcolor);
+        } else {
+            glColor3fv(button[i].color);
+        }
+        glBegin(GL_QUADS);
+        glVertex2i(button[i].r.left,  button[i].r.bot);
+        glVertex2i(button[i].r.left,  button[i].r.top);
+        glVertex2i(button[i].r.right, button[i].r.top);
+        glVertex2i(button[i].r.right, button[i].r.bot);
+        glEnd();
+        r.left = button[i].r.centerx;
+        r.bot  = button[i].r.centery-8;
+        r.center = 1;
+        if (button[i].down) {
+            ggprint16(&r, 0, button[i].text_color, "Pressed!");
+        } else {
+            ggprint16(&r, 0, button[i].text_color, button[i].text);
+        }
+    }
 }
+
 
