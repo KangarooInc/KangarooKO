@@ -45,7 +45,6 @@ void check_mouse(XEvent *e)
     //Log("check_mouse()...\n");
     int x,y;
     int i;
-    //  int cent[2];
     lbutton=0;
     rbutton=0;
     if (e->type == ButtonRelease) {

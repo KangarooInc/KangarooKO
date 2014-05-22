@@ -140,7 +140,7 @@ int main(void)
     initXWindows();
     init_opengl();
     init();
- buttonsInit();
+    buttonsInit();
     init_sounds();
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
@@ -436,7 +436,7 @@ void check_keys(XEvent *e)
     int key = XLookupKeysym(&e->xkey, 0);
     if (e->type == KeyRelease) {
         if (key == XK_Shift_L || key == XK_Shift_R)
-        return;
+            return;
     }
     if (e->type == KeyPress) {
         if (key == XK_Shift_L || key == XK_Shift_R) {
