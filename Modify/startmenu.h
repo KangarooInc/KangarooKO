@@ -5,6 +5,7 @@
 #include "ppm.h"
 // Variables
 extern int done;
+extern int start;
 extern int lbutton;
 extern int rbutton;
 extern int nbuttons;

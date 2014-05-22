@@ -119,6 +119,10 @@ GLuint silhouetteTexture2;
 GLuint backgroundTexture;
 GLuint startTexture;
 GLuint gameoverTexture; //-------------------------------------------------
+int done;
+int lbutton;
+int rbutton;
+int nbuttons;
 int show_kangaroo=1;
 int background=1;
 int start=1;

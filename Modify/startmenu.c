@@ -6,11 +6,6 @@
 #include "ppm.h"
 #include "xwin.h"
 
-int done = 0;
-int lbutton = 0;
-int rbutton = 0;
-int nbuttons = 0;
-
 void StartMenu(void)
 {
     glPushMatrix();
@@ -29,31 +24,34 @@ void StartMenu(void)
 
 void mouse_click(int action)
 {
-    if (action == 1)
+    if(start)
     {
-        int i=0;
-        //center of a grid
+        if (action == 1)
+        {
+            int i=0;
+            //center of a grid
 
-        for (i=0; i<nbuttons; i++) {
-            if (button[i].over) {
-                button[i].down = 1;
-                button[i].click = 1;
-                if (i==0) {
-                    //user clicked button 0
-                    printf("Hello Rhino \n");
-                    show_rhino ^= 1;
+            for (i=0; i<nbuttons; i++) {
+                if (button[i].over) {
+                    //               button[i].down = 1;
+                    //             button[i].click = 1;
+                    if (i==0) {
+                        //user clicked button 0
+                        printf("Hello Rhino \n");
+                        show_rhino ^= 1;
+                    }
+                    if (i==1) {
+                        //user clicked button 0
+                        printf("Hello Kangaroo \n");
+                        show_kangaroo ^= 1;
+                    }
+                    if (i==2) {
+                        //user clicked QUIT
+                        done = 1;
+                    }
                 }
-                if (i==1) {
-                    //user clicked button 0
-                    printf("Hello Kangaroo \n");
-                    show_kangaroo ^= 1;
-                }
-                if (i==2) {
-                    //user clicked QUIT
-                    done = 1;
-                }
-            }
-        } 
+            } 
+        }
     }
 }
 

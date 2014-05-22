@@ -15,11 +15,6 @@
 #include "ppm.h"
 #include "xwin.h"
 
-int GOdone = 0;
-int GOlbutton = 0;
-int GOrbutton = 0;
-int GOnbuttons = 0;
-
 void GameOver(void)
 {
     show_kangaroo = 0;
@@ -46,19 +41,19 @@ void GOmouse_click(int action)
         int i=0;
         //center of a grid
 
-        for (i=0; i<GOnbuttons; i++) {
+        for (i=0; i<nbuttons; i++) {
             if (GObutton[i].over) {
                 GObutton[i].down = 1;
                 GObutton[i].click = 1;
                 if (i==0) {
-                    //user clicked QUIT
-                    GOdone = 1;
-                }
-                if (i==1) {
                     //user clicked button 0
                     //reset_grids();
                     printf("Hello world \n");
                     show_kangaroo ^= 1;
+                }
+                if (i==1) {
+                    //user clicked QUIT
+                    done = 1;
                 }
             }
         }
@@ -72,8 +67,8 @@ void GOcheck_mouse(XEvent *e)
     //Log("check_mouse()...\n");
     int x,y;
     int i;
-    GOlbutton=0;
-    GOrbutton=0;
+    lbutton=0;
+    rbutton=0;
     if (e->type == ButtonRelease) {
         GOmouse_click(2);
         return;
@@ -81,11 +76,11 @@ void GOcheck_mouse(XEvent *e)
     if (e->type == ButtonPress) {
         if (e->xbutton.button==1) {
             //Left button is down
-            GOlbutton=1;
+            lbutton=1;
         }
         if (e->xbutton.button==3) {
             //Right button is down
-            GOrbutton=1;
+            rbutton=1;
         }
     }
     //Log("e->xbutton.x: %i e->xbutton.y: %i\n",e->xbutton.x,e->xbutton.y);
@@ -105,7 +100,7 @@ void GOcheck_mouse(XEvent *e)
     savey=y;
 
 
-    for (i=0; i<GOnbuttons; i++) {
+    for (i=0; i<nbuttons; i++) {
         GObutton[i].over=0;
         GObutton[i].down=0;
         //Log("xy: %i %i\n",x,y);
@@ -118,66 +113,66 @@ void GOcheck_mouse(XEvent *e)
             break;
         }
     }
-    if (GOlbutton)
+    if (lbutton)
         GOmouse_click(1);
-    if (GOrbutton)
+    if (rbutton)
         GOmouse_click(1);
 }
 
 void GObuttonsInit(void)
 {
-    GOnbuttons=0;
-    //
-    // Quit button
-    //size and position
-    GObutton[GOnbuttons].r.width = 200;
-    GObutton[GOnbuttons].r.height = 50;
-    GObutton[GOnbuttons].r.left = xres/2 - GObutton[GOnbuttons].r.width/2;
-    GObutton[GOnbuttons].r.bot = 85;
-    GObutton[GOnbuttons].r.right = GObutton[GOnbuttons].r.left + GObutton[GOnbuttons].r.width;
-    GObutton[GOnbuttons].r.top = GObutton[GOnbuttons].r.bot + GObutton[GOnbuttons].r.height;
-    GObutton[GOnbuttons].r.centerx = (GObutton[GOnbuttons].r.left + GObutton[GOnbuttons].r.right) / 2;
-    GObutton[GOnbuttons].r.centery = (GObutton[GOnbuttons].r.bot + GObutton[GOnbuttons].r.top) / 2;
-    strcpy(GObutton[GOnbuttons].text, "Quit");
-    GObutton[GOnbuttons].down = 0;
-    GObutton[GOnbuttons].click = 0;
-    GObutton[GOnbuttons].color[0] = 0.4f;
-    GObutton[GOnbuttons].color[1] = 0.4f;
-    GObutton[GOnbuttons].color[2] = 0.7f;
-    GObutton[GOnbuttons].dcolor[0] = GObutton[GOnbuttons].color[0] * 0.5f;
-    GObutton[GOnbuttons].dcolor[1] = GObutton[GOnbuttons].color[1] * 0.5f;
-    GObutton[GOnbuttons].dcolor[2] = GObutton[GOnbuttons].color[2] * 0.5f;
-    GObutton[GOnbuttons].text_color = 0x00ffffff;
-    GOnbuttons++;
+    nbuttons=0;
     //
     // Retry button
     //size and position
-    GObutton[GOnbuttons].r.width = 200;
-    GObutton[GOnbuttons].r.height = 50;
-    GObutton[GOnbuttons].r.left = xres/2 - GObutton[GOnbuttons].r.width/2;
-    GObutton[GOnbuttons].r.bot = 160;
-    GObutton[GOnbuttons].r.right = GObutton[GOnbuttons].r.left + GObutton[GOnbuttons].r.width;
-    GObutton[GOnbuttons].r.top = GObutton[GOnbuttons].r.bot + GObutton[GOnbuttons].r.height;
-    GObutton[GOnbuttons].r.centerx = (GObutton[GOnbuttons].r.left + GObutton[GOnbuttons].r.right) / 2;
-    GObutton[GOnbuttons].r.centery = (GObutton[GOnbuttons].r.bot + GObutton[GOnbuttons].r.top) / 2;
-    strcpy(GObutton[GOnbuttons].text, "Reset Grids");
-    GObutton[GOnbuttons].down = 0;
-    GObutton[GOnbuttons].click = 0;
-    GObutton[GOnbuttons].color[0] = 0.4f;
-    GObutton[GOnbuttons].color[1] = 0.4f;
-    GObutton[GOnbuttons].color[2] = 0.7f;
-    GObutton[GOnbuttons].dcolor[0] = GObutton[GOnbuttons].color[0] * 0.5f;
-    GObutton[GOnbuttons].dcolor[1] = GObutton[GOnbuttons].color[1] * 0.5f;
-    GObutton[GOnbuttons].dcolor[2] = GObutton[GOnbuttons].color[2] * 0.5f;
-    GObutton[GOnbuttons].text_color = 0x00ffffff;
-    GOnbuttons++;
+    GObutton[nbuttons].r.width = 200;
+    GObutton[nbuttons].r.height = 50;
+    GObutton[nbuttons].r.left = xres/2 - GObutton[nbuttons].r.width/2;
+    GObutton[nbuttons].r.bot = 160;
+    GObutton[nbuttons].r.right = GObutton[nbuttons].r.left + GObutton[nbuttons].r.width;
+    GObutton[nbuttons].r.top = GObutton[nbuttons].r.bot + GObutton[nbuttons].r.height;
+    GObutton[nbuttons].r.centerx = (GObutton[nbuttons].r.left + GObutton[nbuttons].r.right) / 2;
+    GObutton[nbuttons].r.centery = (GObutton[nbuttons].r.bot + GObutton[nbuttons].r.top) / 2;
+    strcpy(GObutton[nbuttons].text, "Reset Grids");
+    GObutton[nbuttons].down = 0;
+    GObutton[nbuttons].click = 0;
+    GObutton[nbuttons].color[0] = 0.4f;
+    GObutton[nbuttons].color[1] = 0.4f;
+    GObutton[nbuttons].color[2] = 0.7f;
+    GObutton[nbuttons].dcolor[0] = GObutton[nbuttons].color[0] * 0.5f;
+    GObutton[nbuttons].dcolor[1] = GObutton[nbuttons].color[1] * 0.5f;
+    GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
+    GObutton[nbuttons].text_color = 0x00ffffff;
+    nbuttons++;
+    //
+    // Quit button
+    //size and position
+    GObutton[nbuttons].r.width = 200;
+    GObutton[nbuttons].r.height = 50;
+    GObutton[nbuttons].r.left = xres/2 - GObutton[nbuttons].r.width/2;
+    GObutton[nbuttons].r.bot = 85;
+    GObutton[nbuttons].r.right = GObutton[nbuttons].r.left + GObutton[nbuttons].r.width;
+    GObutton[nbuttons].r.top = GObutton[nbuttons].r.bot + GObutton[nbuttons].r.height;
+    GObutton[nbuttons].r.centerx = (GObutton[nbuttons].r.left + GObutton[nbuttons].r.right) / 2;
+    GObutton[nbuttons].r.centery = (GObutton[nbuttons].r.bot + GObutton[nbuttons].r.top) / 2;
+    strcpy(GObutton[nbuttons].text, "Quit");
+    GObutton[nbuttons].down = 0;
+    GObutton[nbuttons].click = 0;
+    GObutton[nbuttons].color[0] = 0.4f;
+    GObutton[nbuttons].color[1] = 0.4f;
+    GObutton[nbuttons].color[2] = 0.7f;
+    GObutton[nbuttons].dcolor[0] = GObutton[nbuttons].color[0] * 0.5f;
+    GObutton[nbuttons].dcolor[1] = GObutton[nbuttons].color[1] * 0.5f;
+    GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
+    GObutton[nbuttons].text_color = 0x00ffffff;
+    nbuttons++;
 }
 
 void bRender(void)
 {
     int i;
     Rect r;
-    for (i=0; i<GOnbuttons; i++) {
+    for (i=0; i<nbuttons; i++) {
         if (GObutton[i].over) {
             glColor3f(1.0f, 0.0f, 0.0f);
             //draw a highlight around button
