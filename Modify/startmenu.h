@@ -2,19 +2,24 @@
 #define _STARTMENU_H_
 
 #include "fonts.h"
-
+#include "ppm.h"
 // Variables
 extern int done;
 extern int lbutton;
 extern int rbutton;
 extern int nbuttons;
 extern int show_kangaroo;
+extern int show_rhino;
+Ppmimage *startImage;
+extern GLuint startTexture;
 #define MAXBUTTONS 8
 
 
 // Prototypes
 void buttonsInit(void);
+void buttonRender (void);
 void mouse_click(int action);
+extern void StartMenu(void);
 
 
 // Struct
