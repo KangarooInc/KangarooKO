@@ -12,15 +12,12 @@ int rbutton = 0;
 int nbuttons = 0;
 
 
-
-void mouse_click(int ibutton, int action, int x, int y)
+void mouse_click(int action)
 {
-    int con;
     if (action == 1)
     {
         int i=0;
         //center of a grid
-        int cent[2];
 
         for (i=0; i<nbuttons; i++) {
             if (button[i].over) {
@@ -52,7 +49,7 @@ void check_mouse(XEvent *e)
     lbutton=0;
     rbutton=0;
     if (e->type == ButtonRelease) {
-        mouse_click(e->xbutton.button, 2, e->xbutton.x, e->xbutton.y);
+        mouse_click(2);
         return;
     }
     if (e->type == ButtonPress) {
@@ -96,9 +93,9 @@ void check_mouse(XEvent *e)
         }
     }
     if (lbutton)
-        mouse_click(1, 1,x,y);
+        mouse_click(1);
     if (rbutton)
-        mouse_click(2, 1,x,y);
+        mouse_click(1);
 }
 
 void buttonsInit(void)

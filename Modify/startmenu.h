@@ -14,7 +14,7 @@ extern int show_kangaroo;
 
 // Prototypes
 void buttonsInit(void);
-void mouse_click(int ibutton, int action, int x, int y);
+void mouse_click(int action);
 
 
 // Struct
