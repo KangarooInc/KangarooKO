@@ -33,15 +33,16 @@ void mouse_click(int action)
 
             for (i=0; i<nbuttons; i++) {
                 if (button[i].over) {
-                    //               button[i].down = 1;
-                    //             button[i].click = 1;
+                    button[i].down = 1;
+                    button[i].click = 1;
                     if (i==0) {
-                        //user clicked button 0
-                        printf("Hello Rhino \n");
-                        show_rhino ^= 1;
+                        //user clicked TOP button (start game)
+                        start = 0;
+                        show_rhino = 1;
+                        rhinoReset();
                     }
                     if (i==1) {
-                        //user clicked button 0
+                        //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
                         show_kangaroo ^= 1;
                     }

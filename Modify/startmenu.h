@@ -20,6 +20,7 @@ extern GLuint startTexture;
 void buttonsInit(void);
 void buttonRender (void);
 void mouse_click(int action);
+extern void rhinoReset(void);
 extern void StartMenu(void);
 
 

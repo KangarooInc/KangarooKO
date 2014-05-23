@@ -123,11 +123,11 @@ int done;
 int lbutton;
 int rbutton;
 int nbuttons;
+int show_rhino=0;
 int show_kangaroo=1;
 int background=1;
 int start=1;
 int gameover=0; //--------------------------------------------------------
-int show_rhino=0;
 int show_ufo=0;
 int silhouette=1;
 int silhouette1=1;
@@ -426,7 +426,7 @@ void rhinoReset(void)
 {
     int i = random(4);
 
-    rhino.pos[0] = 750.0;
+    rhino.pos[0] = (float)xres + 100;
     if (i == 1)
         rhino.pos[1] = 250.0;
     else if (i == 2)
@@ -456,15 +456,11 @@ void check_keys(XEvent *e)
 
     Flt punch_dist, hit_dist;
     switch(key) {
+       /*Dont need this because start button;
         case XK_Return:
             start = 0;
             break;
-        case XK_r:
-            show_rhino ^= 1;
-            if (show_rhino) {
-                rhinoReset();
-            }
-            break;
+            */
         case XK_a:
             show_ufo ^= 1;
             break;
@@ -476,20 +472,28 @@ void check_keys(XEvent *e)
             show_kangaroo ^= 1;
             break;
         case XK_Left:
+            if (!(kangaroo.pos[0] - kangaroo.width2 < -80.0)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] -= 10.0;
+            kangaroo.pos[0] -= 20.0;
+            }
             break;
         case XK_Right:
+            if (!(kangaroo.pos[0] + kangaroo.width2 >= (float)xres)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] += 10.0;
+            kangaroo.pos[0] += 20.0;
+            }
             break;
         case XK_Up:
+            if (!(kangaroo.pos[1] >= (float)yres)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
             kangaroo.pos[1] += 65.0;
+            }
             break;
         case XK_Down:
+             if (!(kangaroo.pos[1] < 100.0)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
             kangaroo.pos[1] -= 65.0;
+             }
             break;
         case XK_n:
             play_sounds ^= 1;
@@ -499,14 +503,12 @@ void check_keys(XEvent *e)
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 0) {
+                if ((hit_dist - punch_dist) >= 0 && (hit_dist - punch_dist <= 100.0))
+                {
                     if (show_rhino) {
                         rhinoReset();
                     }
                     high_score += 100;
-                }
-                else {
-                    lives--;
                 }
             }
             break;
@@ -567,6 +569,10 @@ void physics(void)
         move_rhino();
     if (show_ufo)
         move_ufo();
+    if ((kangaroo.pos[0] - rhino.pos[0]) == 0) 
+    {
+        lives--;
+    }
 }
 
 #ifdef USE_KANGAROO
@@ -705,19 +711,21 @@ void render(void)
         draw_kangaroo();
 #endif //USE_KANGAROO
     glBindTexture(GL_TEXTURE_2D, 0);
-    
-    //
+        
     r.bot = yres - 20;
     r.left = 10;
     r.center = 0;
     unsigned int cref = 0x00ffffff;
-    ggprint8b(&r, 16, cref, "S - Silhouette");
-    ggprint8b(&r, 16, cref, "K - Kangaroo");
-    ggprint8b(&r, 16, cref, "R - Rhino");
-    ggprint8b(&r, 16, cref, "N - Sounds");
-    ggprint8b(&r, 16, cref, "A - Alien Abduction");
-    ggprint8b(&r, 16, cref, "Lives: %i", lives);
-    ggprint8b(&r, 16, cref, "High Score:%i", high_score);
+
+    if(!(show_kangaroo && show_rhino))
+    {
+        ggprint8b(&r, 16, cref, "S - Silhouette");
+        ggprint8b(&r, 16, cref, "K - Kangaroo");
+        ggprint8b(&r, 16, cref, "R - Rhino");
+        ggprint8b(&r, 16, cref, "N - Sounds");
+        ggprint8b(&r, 16, cref, "A - Alien Abduction");
+    }
+
+        ggprint8b(&r, 16, cref, "Lives: %i", lives);
+        ggprint8b(&r, 16, cref, "High Score:%i", high_score);
 }
-
-
