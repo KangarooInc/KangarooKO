@@ -257,7 +257,7 @@ void init_opengl(void)
     //
     kangarooImage    = ppm6GetImage("./images/ricky.ppm");
     backgroundImage  = ppm6GetImage("./images/background.ppm");
-    startImage       = ppm6GetImage("./images/blank.ppm");
+    startImage       = ppm6GetImage("./images/start.ppm");
     gameoverImage    = ppm6GetImage("./images/gameover.ppm"); //-------------------------------------------------------
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
     ufoImage	     = ppm6GetImage("./images/ufo.ppm");
@@ -464,19 +464,23 @@ void check_keys(XEvent *e)
         case XK_a:
             show_ufo ^= 1;
             break;
-        case XK_l:
-            lives -= lives;
+        case XK_s:
+            silhouette ^= 1;
+            printf("silhouette: %i\n",silhouette);
+            break;
+        case XK_k:
+            show_kangaroo ^= 1;
             break;
         case XK_Left:
             if (!(kangaroo.pos[0] - kangaroo.width2 < -80.0)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] -= 50.0;
+            kangaroo.pos[0] -= 20.0;
             }
             break;
         case XK_Right:
             if (!(kangaroo.pos[0] + kangaroo.width2 >= (float)xres)) {
             VecCopy(kangaroo.pos, kangaroo.lastpos);
-            kangaroo.pos[0] += 50.0;
+            kangaroo.pos[0] += 20.0;
             }
             break;
         case XK_Up:
@@ -600,7 +604,7 @@ void render(void)
     static double yOFFset = 0.0;
     if(start == 0)
     {
-        yOFFset -= 1;
+        yOFFset -= 0.01;
         if(yOFFset>100.0)
             yOFFset -=100.0;
     }
@@ -629,8 +633,6 @@ void render(void)
     }
     if (start) {
         StartMenu();
-        kangaroo.pos[1] = 50.0;
-        kangaroo.pos[0] = 60.0;
     }
     if (lives <= 0) {
         GameOver();
@@ -647,12 +649,17 @@ void render(void)
             glColor4ub(255,255,255,255);
         }
         glBegin(GL_QUADS);
-        //This is for the rhino imagae going right to left
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-        //#################################################
+        if (rhino.vel[0] > 0.0) {
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
+        } else {
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
+            glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
+        }
         glEnd();
         glPopMatrix();
         glDisable(GL_ALPHA_TEST);
@@ -710,24 +717,15 @@ void render(void)
     r.center = 0;
     unsigned int cref = 0x00ffffff;
 
-    if(start)
+    if(!(show_kangaroo && show_rhino))
     {
-    r.bot = yres - 100;
-    r.left = xres/2;
-    r.center = 1;
-    unsigned int cref = 0x00ffffff;
-    
-    //Help menu only show in start
-        ggprint8b(&r, 16, cref, "Move Up: UP Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Down: Down Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Left: Left Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Right: Right Arrow Key");
-        ggprint8b(&r, 16, cref, "Punch: Space Key");
+        ggprint8b(&r, 16, cref, "S - Silhouette");
+        ggprint8b(&r, 16, cref, "K - Kangaroo");
+        ggprint8b(&r, 16, cref, "R - Rhino");
+        ggprint8b(&r, 16, cref, "N - Sounds");
+        ggprint8b(&r, 16, cref, "A - Alien Abduction");
     }
-    if(show_kangaroo && show_rhino)
-    {
-        //In game menu, only show in game
+
         ggprint8b(&r, 16, cref, "Lives: %i", lives);
         ggprint8b(&r, 16, cref, "High Score:%i", high_score);
-    }
 }
