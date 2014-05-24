@@ -9,7 +9,7 @@
 void StartMenu(void)
 {
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, startTexture);
+    glBindTexture(GL_TEXTURE_2D, StartTexture);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
     glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
@@ -44,7 +44,6 @@ void mouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
-                        show_kangaroo ^= 1;
                     }
                     if (i==2) {
                         //user clicked QUIT

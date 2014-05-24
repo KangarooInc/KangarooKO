@@ -11,7 +11,7 @@ extern int nbuttons;
 extern int show_kangaroo;
 extern int show_rhino;
 Ppmimage *gameoverImage;
-extern GLuint gameoverTexture;
+extern GLuint GameOverTexture;
 #define GOMAXBUTTONS 8
 
 
