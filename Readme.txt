@@ -1,1 +1,1 @@
-Getting a feel for git, shit is bananas yo.
+LOOK AT JOSE'S BRANCH FOR MOST UP TO DATE PROJECT. FIXED A LOT OF SHIT GUISE :^)
