@@ -1,3 +1,4 @@
+/* Header file */
 #ifndef _PUNCH_H_
 #define _PUNCH_H_
 #include "ppm.h"

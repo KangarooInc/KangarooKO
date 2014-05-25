@@ -1,3 +1,6 @@
+/* Author: Bjarne Henriquez
+ * None of this code is usable yet
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
