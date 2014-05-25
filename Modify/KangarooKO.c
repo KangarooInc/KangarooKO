@@ -73,7 +73,10 @@ void init();
 void init_sounds(void);
 void physics(void);
 void render(void);
+void restartGame();
 void rhinoReset(void);
+void kangarooReset(void);
+void kangarooDeath(void);
 void draw_kangaroo(void);
 void draw_rhino(float);
 void draw_ufo(float);
@@ -110,6 +113,7 @@ Ppmimage *kangarooImage=NULL;
 Ppmimage *levelImage=NULL;
 Ppmimage *mountainsImage=NULL;
 Ppmimage *startImage=NULL;
+Ppmimage *whiteImage=NULL;
 Ppmimage *rhinoImage=NULL;
 Ppmimage *ufoImage=NULL;
 Ppmimage *gameoverImage=NULL; //------------------------------------------------
@@ -119,6 +123,7 @@ GLuint UFOTexture;
 GLuint MountainTexture;
 GLuint LevelTexture;
 GLuint StartTexture;
+GLuint WhiteTexture;
 GLuint GameOverTexture; //-------------------------------------------------
 
 //variables
@@ -130,15 +135,18 @@ int show_rhino=0;
 int show_kangaroo=1;
 int background=1;
 int start=1;
-int gameover=0; //--------------------------------------------------------
+int white=0;
+int gameover=1; //--------------------------------------------------------
 int show_ufo=0;
 int silhouette=1;
 int silhouette1=1;
 int silhouette2=2;
 int high_score=0;    // high score tracker, prints in render()
 int lives=3;
+static double setLevel = 0.0;
+static double setMountain = 0.0;
 #ifdef USE_SOUND
-int play_sounds = 0;
+int play_sounds = 1;
 #endif //USE_SOUND
 //
 
@@ -262,6 +270,7 @@ void init_opengl(void)
     levelImage       = ppm6GetImage("./images/LevelBlack.ppm");
     mountainsImage  = ppm6GetImage("./images/BackBlack.ppm");
     startImage       = ppm6GetImage("./images/blank.ppm");
+    whiteImage       = ppm6GetImage("./images/white.ppm");
     gameoverImage    = ppm6GetImage("./images/gameover.ppm"); //-------------------------------------------------------
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
     ufoImage	     = ppm6GetImage("./images/ufo.ppm");
@@ -272,6 +281,7 @@ void init_opengl(void)
     glGenTextures(1, &LevelTexture);
     glGenTextures(1, &MountainTexture);
     glGenTextures(1, &StartTexture);
+    glGenTextures(1, &WhiteTexture);
     glGenTextures(1, &RhinoTexture);
     glGenTextures(1, &GameOverTexture); //-----------------------------------------------------------------
 
@@ -289,7 +299,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *RhinoTransparent = buildAlphaData(rhinoImage);	
+    unsigned char *RhinoTransparent = buildAlphaData(rhinoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w1, h1, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, RhinoTransparent);
     free(RhinoTransparent);
@@ -306,7 +316,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *UFOTransparent = buildAlphaData(ufoImage);	
+    unsigned char *UFOTransparent = buildAlphaData(ufoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, UFOTransparent);
     free(UFOTransparent);
@@ -323,7 +333,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *KangarooTransparent = buildAlphaData(kangarooImage);	
+    unsigned char *KangarooTransparent = buildAlphaData(kangarooImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, KangarooTransparent);
     free(KangarooTransparent);
@@ -337,7 +347,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *LevelsTransparent = buildAlphaData(levelImage);	
+    unsigned char *LevelsTransparent = buildAlphaData(levelImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, levelImage->width, levelImage->height, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, LevelsTransparent);
     free(LevelsTransparent);
@@ -351,7 +361,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *MountainsTransparent = buildAlphaData(mountainsImage);	
+    unsigned char *MountainsTransparent = buildAlphaData(mountainsImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mountainsImage->width, mountainsImage->height, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, MountainsTransparent);
     free(MountainsTransparent);
@@ -366,6 +376,17 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
             startImage->width, startImage->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, startImage->data);
+    //-------------------------------------------------------------------------
+    //
+    // Death flash
+    //
+    glBindTexture(GL_TEXTURE_2D, WhiteTexture);
+    //
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+            whiteImage->width, whiteImage->height,
+            0, GL_RGB, GL_UNSIGNED_BYTE, whiteImage->data);
     //-------------------------------------------------------------------------
     //
     // Gameover
@@ -401,23 +422,27 @@ void init_sounds(void)
         printf("ERROR - fmod_init()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/tick.wav", 0)) {
+    if (fmod_createsound("./sounds/Intro.mp3", 0)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/drip.wav", 1)) {
+    if (fmod_createsound("./sounds/Killing Joke Intro.mp3", 1)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    fmod_setmode(0,FMOD_LOOP_OFF);
-    //fmod_playsound(0);
+    if (fmod_createsound("./sounds/Punch Sound Effect.mp3", 2)) {
+        printf("ERROR - fmod_createsound()\n\n");
+        return;
+    }
+    fmod_setmode(1,FMOD_LOOP_NORMAL);
+    fmod_playsound(1);
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
 
 void init() {
-    kangaroo.pos[0] = 100.0;
-    kangaroo.pos[1] = (double)(yres-225);
+    kangaroo.pos[0] = 60.0;
+    kangaroo.pos[1] = 60.0;
     VecCopy(kangaroo.pos, kangaroo.lastpos);
     kangaroo.width = 200.0;
     kangaroo.width2 = kangaroo.width * 0.5;
@@ -434,19 +459,45 @@ void init() {
     MakeVector(0.0,-6.0,0.0, ufo.vel);
 }
 
+void restartGame()
+{
+    lives = 3;
+    high_score = 0;
+    rhinoReset();
+    kangarooReset();
+}
+
 void rhinoReset(void)
 {
+    show_rhino = 1;
+
     int i = random(4);
 
-    rhino.pos[0] = (float)xres + 100;
+    rhino.pos[0] = (float)xres + 150;
     if (i == 1)
-        rhino.pos[1] = 250.0;
+        rhino.pos[1] = 260.0;
     else if (i == 2)
-        rhino.pos[1] = 180.0;
+        rhino.pos[1] = 190.0;
     else if (i == 3)
         rhino.pos[1] = 120.0;
     else
-        rhino.pos[1] = 50.0;
+        rhino.pos[1] = 60.0;
+}
+
+void kangarooReset(void)
+{
+    show_kangaroo = 1;
+
+    kangaroo.pos[1] = 60.0;
+    kangaroo.pos[0] = 60.0;
+}
+
+void kangarooDeath(void)
+{
+    lives--;
+    rhinoReset();
+    kangarooReset();
+
 }
 
 void check_keys(XEvent *e)
@@ -465,7 +516,6 @@ void check_keys(XEvent *e)
         return;
     }
 
-
     Flt punch_dist, hit_dist;
     switch(key) {
         /*Dont need this because start button;
@@ -476,42 +526,47 @@ void check_keys(XEvent *e)
         case XK_a:
             show_ufo ^= 1;
             break;
+        case XK_j:
+            kangarooDeath();
+            break;
+        case XK_k:
+            lives += 1;
+            break;
         case XK_l:
             lives -= lives;
             break;
         case XK_Left:
-            if (!(kangaroo.pos[0] - kangaroo.width2 < -80.0)) {
+            if (!(kangaroo.pos[0] - kangaroo.width2 < (xres-xres))) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
                 kangaroo.pos[0] -= 50.0;
             }
             break;
         case XK_Right:
-            if (!(kangaroo.pos[0] + kangaroo.width2 >= (float)xres)) {
+            if (!(kangaroo.pos[0] + kangaroo.width2 >= xres)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
                 kangaroo.pos[0] += 50.0;
             }
             break;
         case XK_Up:
-            if (!(kangaroo.pos[1] >= (float)yres)) {
+            if (!(kangaroo.pos[1] >= (float)yres/2)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[1] += 65.0;
+                kangaroo.pos[1] += 67.0;
             }
             break;
         case XK_Down:
             if (!(kangaroo.pos[1] < 100.0)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[1] -= 65.0;
+                kangaroo.pos[1] -= 67.0;
             }
             break;
-        case XK_n:
-            play_sounds ^= 1;
-            break;
         case XK_space:
+
+            fmod_playsound(2);
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 0 && (hit_dist - punch_dist <= 100.0))
+                if ((hit_dist - punch_dist) >= 0 && (hit_dist - punch_dist <= 50.0))
                 {
                     if (show_rhino) {
                         rhinoReset();
@@ -526,21 +581,6 @@ void check_keys(XEvent *e)
     }
 }
 
-void normalize(Vec vec)
-{
-    Flt xlen = vec[0];
-    Flt ylen = vec[1];
-    Flt zlen = vec[2];
-    Flt len = xlen*xlen + ylen*ylen + zlen*zlen;
-    if (len == 0.0) {
-        MakeVector(0.0,0.0,1.0,vec);
-        return;
-    }
-    len = 1.0 / sqrt(len);
-    vec[0] = xlen * len;
-    vec[1] = ylen * len;
-    vec[2] = zlen * len;
-}
 
 void move_rhino()
 {
@@ -553,17 +593,8 @@ void move_rhino()
     if ((rhino.pos[0] < -140.0 && rhino.vel[0] < 0.0) ||
             (rhino.pos[0] >= (float)xres+140.0 && rhino.vel[0] > 0.0)) {
         rhino.vel[0] = -rhino.vel[0];
-        rhino.pos[0] = 1000.0; //make rhino appear on right
-        //addgrav = 0;
+        rhinoReset();
     }
-    if ((rhino.pos[1] < 150.0 && rhino.vel[1] < 0.0) ||
-            (rhino.pos[1] >= (float)yres && rhino.vel[1] > 0.0)) {
-        rhino.vel[1] = -rhino.vel[1];
-        //addgrav = 0;
-    }
-    /*Gravity
-      if (addgrav)
-      kangaroo.vel[1] -= 0.75;*/
 }
 
 void move_ufo()
@@ -577,9 +608,9 @@ void physics(void)
         move_rhino();
     if (show_ufo)
         move_ufo();
-    if ((kangaroo.pos[0] - rhino.pos[0]) == 0) 
+    if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
     {
-        lives--;
+        kangarooDeath();
     }
 }
 
@@ -652,17 +683,18 @@ void draw_ufo(float wid)
 
 void draw_background(void)
 {
-    static double yOFFsetLevel = 0.0;
-    static double yOFFsetMountain = 0.0;
+    double *yOFFsetLevel = &setLevel;
+    double *yOFFsetMountain = &setMountain;
+
     if(!start)
     {
-        yOFFsetLevel -= 1;
-        if(yOFFsetLevel>100.0)
-            yOFFsetLevel -=100.0;
+        *yOFFsetLevel -= 2;
+        /*if(*yOFFsetLevel>100.0)*/
+        /**yOFFsetLevel -=100.0;*/
 
-        yOFFsetMountain -= .1;
-        if(yOFFsetMountain>100.0)
-            yOFFsetMountain -=100.0;
+        *yOFFsetMountain -= .5;
+        /*if(*yOFFsetMountain>100.0)*/
+        /**yOFFsetMountain -=100.0;*/
     }
 
     glPushMatrix();
@@ -670,7 +702,7 @@ void draw_background(void)
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.0f);
     glColor4ub(255,255,255,255);
-    glTranslatef(yOFFsetMountain, 0.0f, 0.0f);
+    glTranslatef(*yOFFsetMountain, 0.0f, 0.0f);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
     glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
@@ -684,7 +716,7 @@ void draw_background(void)
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.0f);
     glColor4ub(255,255,255,255);
-    glTranslatef(yOFFsetLevel, 0.0f, 0.0f);
+    glTranslatef(*yOFFsetLevel, 0.0f, 0.0f);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
     glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
@@ -707,14 +739,34 @@ void render(void)
     float wid = 120.0f;
     glColor3f(1.0, 1.0, 1.0);
 
+    //Loop the background
+    double *yOFFsetLevel = &setLevel;
+    double *yOFFsetMountain = &setMountain;
+
+    if(*yOFFsetLevel <= -(levelImage->width))
+        *yOFFsetLevel = 0.0;
+    if(*yOFFsetMountain <= -(mountainsImage->width))
+        *yOFFsetMountain = 0.0;
+    /////////////////////////////////////////////
 
     if (background) {
         draw_background();
     }
     if (start) {
         StartMenu();
-        kangaroo.pos[1] = 50.0;
-        kangaroo.pos[0] = 60.0;
+    }
+    if(white)
+    {
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, WhiteTexture);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
+    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
+    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
+    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
+    glEnd();
+    glPopMatrix();
     }
     if (lives <= 0) {
         GameOver();
@@ -741,7 +793,7 @@ void render(void)
     r.bot = yres - 20;
     r.left = 10;
     r.center = 0;
-    unsigned int cref = 0x00ffffff;
+    unsigned int cref = 0x00000000;
 
     if(start)
     {
@@ -760,7 +812,7 @@ void render(void)
     if(show_kangaroo && show_rhino)
     {
         //In game menu, only show in game
-        ggprint8b(&r, 16, cref, "Lives: %i", lives);
-        ggprint8b(&r, 16, cref, "High Score:%i", high_score);
+        ggprint16(&r, 16, cref, "Lives: %i", lives);
+        ggprint16(&r, 16, cref, "High Score: %i", high_score);
     }
 }

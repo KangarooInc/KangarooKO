@@ -10,6 +10,9 @@ extern int rbutton;
 extern int nbuttons;
 extern int show_kangaroo;
 extern int show_rhino;
+extern int lives;
+extern int gameover;
+extern int high_score;
 Ppmimage *gameoverImage;
 extern GLuint GameOverTexture;
 #define GOMAXBUTTONS 8
@@ -20,6 +23,7 @@ void GObuttonsInit(void);
 void bRender(void);
 void GOmouse_click(int action);
 extern void GameOver(void);
+extern void restartGame(void);
 
 
 //Struct

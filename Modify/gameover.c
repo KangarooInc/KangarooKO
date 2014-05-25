@@ -36,30 +36,30 @@ void GameOver(void)
 
 void GOmouse_click(int action)
 {
-    if (action == 1)
+    if(!show_rhino && !show_kangaroo)
     {
-        int i=0;
-        //center of a grid
+        if (action == 1)
+        {
+            int i=0;
+            //center of a grid
 
-        for (i=0; i<nbuttons; i++) {
-            if (GObutton[i].over) {
-                GObutton[i].down = 1;
-                GObutton[i].click = 1;
-                if (i==0) {
-                    //user clicked button 0
-                    //reset_grids();
-                    printf("Hello world \n");
-                    show_kangaroo ^= 1;
-                }
-                if (i==1) {
-                    //user clicked QUIT
-                    done = 1;
+            for (i=0; i<nbuttons; i++) {
+                if (GObutton[i].over) {
+                    GObutton[i].down = 1;
+                    GObutton[i].click = 1;
+                    if (i==0) {
+                        //user clicked Retry
+                        restartGame();
+                    }
+                    if (i==1) {
+                        //user clicked QUIT
+                        done = 1;
+                    }
                 }
             }
         }
     }
 }
-
 void GOcheck_mouse(XEvent *e)
 {
     static int savex = 0;
@@ -133,7 +133,7 @@ void GObuttonsInit(void)
     GObutton[nbuttons].r.top = GObutton[nbuttons].r.bot + GObutton[nbuttons].r.height;
     GObutton[nbuttons].r.centerx = (GObutton[nbuttons].r.left + GObutton[nbuttons].r.right) / 2;
     GObutton[nbuttons].r.centery = (GObutton[nbuttons].r.bot + GObutton[nbuttons].r.top) / 2;
-    strcpy(GObutton[nbuttons].text, "Reset Grids");
+    strcpy(GObutton[nbuttons].text, "Retry");
     GObutton[nbuttons].down = 0;
     GObutton[nbuttons].click = 0;
     GObutton[nbuttons].color[0] = 0.4f;

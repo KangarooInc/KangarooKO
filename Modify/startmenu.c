@@ -38,8 +38,8 @@ void mouse_click(int action)
                     if (i==0) {
                         //user clicked TOP button (start game)
                         start = 0;
-                        show_rhino = 1;
                         rhinoReset();
+                        kangarooReset();
                     }
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
@@ -50,7 +50,7 @@ void mouse_click(int action)
                         done = 1;
                     }
                 }
-            } 
+            }
         }
     }
 }
@@ -157,13 +157,13 @@ void buttonRender (void)
 void buttonsInit(void)
 {
     nbuttons=0;
-    //  
+    //
     //Start Game
     //size and position
     button[nbuttons].r.width = 200;
     button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
-    button[nbuttons].r.bot = 160; 
+    button[nbuttons].r.bot = 160;
     button[nbuttons].r.right = button[nbuttons].r.left + button[nbuttons].r.width;
     button[nbuttons].r.top = button[nbuttons].r.bot + button[nbuttons].r.height;
     button[nbuttons].r.centerx = (button[nbuttons].r.left + button[nbuttons].r.right) / 2;
@@ -179,13 +179,13 @@ void buttonsInit(void)
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;
     button[nbuttons].text_color = 0x00ffffff;
     nbuttons++;
-    //  
+    //
     //High Score
     //size and position
     button[nbuttons].r.width = 200;
     button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
-    button[nbuttons].r.bot = 85; 
+    button[nbuttons].r.bot = 85;
     button[nbuttons].r.right = button[nbuttons].r.left + button[nbuttons].r.width;
     button[nbuttons].r.top = button[nbuttons].r.bot + button[nbuttons].r.height;
     button[nbuttons].r.centerx = (button[nbuttons].r.left + button[nbuttons].r.right) / 2;
@@ -201,13 +201,13 @@ void buttonsInit(void)
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;
     button[nbuttons].text_color = 0x00ffffff;
     nbuttons++;
-    //  
+    //
     //Quit button
     //size and position
     button[nbuttons].r.width = 200;
-    button[nbuttons].r.height = 50; 
+    button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
-    button[nbuttons].r.bot = 10; 
+    button[nbuttons].r.bot = 10;
     button[nbuttons].r.right = button[nbuttons].r.left + button[nbuttons].r.width;
     button[nbuttons].r.top = button[nbuttons].r.bot + button[nbuttons].r.height;
     button[nbuttons].r.centerx = (button[nbuttons].r.left + button[nbuttons].r.right) / 2;
@@ -218,7 +218,7 @@ void buttonsInit(void)
     button[nbuttons].color[0] = 0.4f;
     button[nbuttons].color[1] = 0.4f;
     button[nbuttons].color[2] = 0.7f;
-    button[nbuttons].dcolor[0] = button[nbuttons].color[0] * 0.5f; 
+    button[nbuttons].dcolor[0] = button[nbuttons].color[0] * 0.5f;
     button[nbuttons].dcolor[1] = button[nbuttons].color[1] * 0.5f;
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;
     button[nbuttons].text_color = 0x00ffffff;
