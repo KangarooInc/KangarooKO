@@ -6,3 +6,4 @@ Things to do:
 *Fix Lives--
 *Implement a wait period(1 second) after space is pressed to prevent cheating
 
+
