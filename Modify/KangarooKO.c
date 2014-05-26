@@ -81,6 +81,7 @@ void draw_kangaroo(void);
 void draw_rhino(float);
 void draw_ufo(float);
 void draw_background(void);
+void draw_white(void);
 
 //structures
 typedef struct t_rhino {
@@ -422,15 +423,15 @@ void init_sounds(void)
         printf("ERROR - fmod_init()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/Intro.mp3", 0)) {
+    /*if (fmod_createsound("./sounds/Intro.mp3", 0)) {
+      printf("ERROR - fmod_createsound()\n\n");
+      return;
+      }*/
+    if (fmod_createsound("./sounds/KillingJokeIntro.mp3", 1)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/Killing Joke Intro.mp3", 1)) {
-        printf("ERROR - fmod_createsound()\n\n");
-        return;
-    }
-    if (fmod_createsound("./sounds/Punch Sound Effect.mp3", 2)) {
+    if (fmod_createsound("./sounds/PunchSoundEffect.mp3", 2)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
@@ -681,6 +682,19 @@ void draw_ufo(float wid)
     glDisable(GL_ALPHA_TEST);
 }
 
+void draw_white(void)
+{
+    glPushMatrix();
+        glBindTexture(GL_TEXTURE_2D, WhiteTexture);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
+        glEnd();
+        glPopMatrix();
+        }
+
 void draw_background(void)
 {
     double *yOFFsetLevel = &setLevel;
@@ -757,23 +771,31 @@ void render(void)
     }
     if(white)
     {
-
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, WhiteTexture);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
-    glEnd();
-    glPopMatrix();
+        draw_white();
     }
     if (lives <= 0) {
         GameOver();
     }
-    if (show_rhino) {
-        draw_rhino(wid);
+
+    if (kangaroo.pos[1] < rhino.pos[1])
+    {
+        if (show_rhino) {
+            draw_rhino(wid);
+        }
+        if (show_kangaroo) {
+            draw_kangaroo();
+        }
     }
+    else if (kangaroo.pos[1] >= rhino.pos[1])
+    {
+        if (show_kangaroo) {
+            draw_kangaroo();
+        }
+        if (show_rhino) {
+            draw_rhino(wid);
+        }
+    }
+
     if (show_ufo) {
         draw_ufo(wid);
     }
@@ -783,10 +805,6 @@ void render(void)
     glEnable(GL_BLEND);
     glDisable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
-
-    //
-    if (show_kangaroo)
-        draw_kangaroo();
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
