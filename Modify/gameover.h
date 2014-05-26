@@ -10,6 +10,7 @@ extern int rbutton;
 extern int nbuttons;
 extern int show_kangaroo;
 extern int show_rhino;
+extern int show_animal;
 extern int lives;
 extern int gameover;
 extern int high_score;

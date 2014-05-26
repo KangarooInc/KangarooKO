@@ -8,11 +8,10 @@ int main ()
   while (1 == 1)
   {
   seconds = time(NULL);
-      if(seconds%2 == 1)
+      if(seconds%60 == 0)
       {
   printf("Hours since January 1, 1970 = %ld\n", seconds);
       }
-      seconds -= .9999999999999999999999999;
 
   }
 

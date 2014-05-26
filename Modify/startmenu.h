@@ -11,6 +11,7 @@ extern int rbutton;
 extern int nbuttons;
 extern int show_kangaroo;
 extern int show_rhino;
+extern int show_animal;
 extern GLuint StartTexture;
 #define MAXBUTTONS 8
 
@@ -20,6 +21,7 @@ void buttonsInit(void);
 void buttonRender (void);
 void mouse_click(int action);
 extern void rhinoReset(void);
+extern void animalReset(void);
 extern void kangarooReset(void);
 extern void StartMenu(void);
 

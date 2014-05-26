@@ -27,6 +27,7 @@
 #include "xwin.h"
 #include "gameover.h"
 #include "startmenu.h"
+#include "punch.h"
 
 #define USE_SOUND
 
@@ -111,6 +112,9 @@ Kangaroo kangaroo;
 
 //opengl stuff
 Ppmimage *kangarooImage=NULL;
+Ppmimage *punch1Image = NULL;
+Ppmimage *punch2Image = NULL;
+Ppmimage *punch3Image = NULL;
 Ppmimage *levelImage=NULL;
 Ppmimage *mountainsImage=NULL;
 Ppmimage *startImage=NULL;
@@ -125,6 +129,9 @@ GLuint MountainTexture;
 GLuint LevelTexture;
 GLuint StartTexture;
 GLuint WhiteTexture;
+GLuint punch1Texture;
+GLuint punch2Texture;
+GLuint punch3Texture;
 GLuint GameOverTexture; //-------------------------------------------------
 
 //variables
@@ -139,11 +146,9 @@ int start=1;
 int white=0;
 int gameover=1; //--------------------------------------------------------
 int show_ufo=0;
-int silhouette=1;
-int silhouette1=1;
-int silhouette2=2;
 int high_score=0;    // high score tracker, prints in render()
 int lives=3;
+int punch_image = 0;
 static double setLevel = 0.0;
 static double setMountain = 0.0;
 #ifdef USE_SOUND
@@ -179,7 +184,6 @@ int main(void)
             physicsCountdown -= physicsRate;
         }
         render();
-        //buttonRender();-----------------------------------------------------------
         glXSwapBuffers(dpy, win);
     }
     cleanupXWindows();
@@ -202,7 +206,6 @@ void reshape_window(int width, int height)
     glOrtho(0, xres, 0, yres, -1, 1);
     set_title();
 }
-
 
 unsigned char *buildAlphaData(Ppmimage *img)
 {
@@ -286,7 +289,6 @@ void init_opengl(void)
     glGenTextures(1, &RhinoTexture);
     glGenTextures(1, &GameOverTexture); //-----------------------------------------------------------------
 
-
     //-------------------------------------------------------------------------
     //
     // Rhino
@@ -300,10 +302,10 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *RhinoTransparent = buildAlphaData(rhinoImage);
+    unsigned char *Transparent = buildAlphaData(rhinoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w1, h1, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, RhinoTransparent);
-    free(RhinoTransparent);
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
     //-------------------------------------------------------------------------
     //
     // UFO Spaceship
@@ -317,10 +319,10 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *UFOTransparent = buildAlphaData(ufoImage);
+    Transparent = buildAlphaData(ufoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, UFOTransparent);
-    free(UFOTransparent);
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
     //-------------------------------------------------------------------------
     //
     // Kangaroo
@@ -334,10 +336,10 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *KangarooTransparent = buildAlphaData(kangarooImage);
+    Transparent = buildAlphaData(kangarooImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, KangarooTransparent);
-    free(KangarooTransparent);
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
     //-------------------------------------------------------------------------
     //
     // Background - Platforms
@@ -348,10 +350,10 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *LevelsTransparent = buildAlphaData(levelImage);
+    Transparent = buildAlphaData(levelImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, levelImage->width, levelImage->height, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, LevelsTransparent);
-    free(LevelsTransparent);
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
     //-------------------------------------------------------------------------
     //
     // Background - Mountains
@@ -362,10 +364,10 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *MountainsTransparent = buildAlphaData(mountainsImage);
+    Transparent = buildAlphaData(mountainsImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mountainsImage->width, mountainsImage->height, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, MountainsTransparent);
-    free(MountainsTransparent);
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
     //-------------------------------------------------------------------------
     //
     // Start Page
@@ -400,6 +402,7 @@ void init_opengl(void)
             gameoverImage->width, gameoverImage->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, gameoverImage->data);
     //-------------------------------------------------------------------------
+init_punch_texture();
 }
 
 void check_resize(XEvent *e)
@@ -533,6 +536,9 @@ void check_keys(XEvent *e)
         case XK_k:
             lives += 1;
             break;
+        case XK_t:
+            printf("PhysicsRate: %f\n PhysicsCountdown: %f\n",physicsRate, physicsCountdown) ;
+            break;
         case XK_l:
             lives -= lives;
             break;
@@ -561,7 +567,7 @@ void check_keys(XEvent *e)
             }
             break;
         case XK_space:
-
+            punch_image+=1;
             fmod_playsound(2);
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
@@ -581,7 +587,6 @@ void check_keys(XEvent *e)
             break;
     }
 }
-
 
 void move_rhino()
 {
@@ -799,6 +804,8 @@ void render(void)
     if (show_ufo) {
         draw_ufo(wid);
     }
+
+    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
 
     glDisable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
