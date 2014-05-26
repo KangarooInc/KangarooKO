@@ -8,4 +8,4 @@ Things to do:
 *Fix Lives--, ricky dies when hes on a clear level too, fix that.
 *Implement a wait period(1 second) after space is pressed to prevent cheating
 
-
+Sleinir Test
