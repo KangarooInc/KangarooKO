@@ -610,14 +610,24 @@ void move_ufo()
 
 void physics(void)
 {
-    if (show_rhino)
+    Flt d0,d1,dist;
+    Flt hit_dist;
+    if (show_rhino) {
         move_rhino();
+        hit_dist = rhino.pos[0] - 50.0;
+        d0 = kangaroo.pos[0] - hit_dist;
+        d1 = kangaroo.pos[1] - rhino.pos[1];
+        dist = d0*d0+d1*d1;
+        if (dist < (50.0*50.0)) {
+            kangarooDeath();
+        }
+    }
     if (show_ufo)
         move_ufo();
-    if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
+    /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
     {
         kangarooDeath();
-    }
+    }*/
 }
 
 void draw_kangaroo(void)
