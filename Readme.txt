@@ -3,7 +3,7 @@ Things to do:
 *Add another enemy, this one is punchable so use that code
 *Do animation 
 *Flash screen on lives-- to know you died
-*Fix Lives--
+*Fix Lives--, ricky dies when hes on a clear level too, fix that.
 *Implement a wait period(1 second) after space is pressed to prevent cheating
 
 

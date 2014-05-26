@@ -11,7 +11,6 @@ extern int rbutton;
 extern int nbuttons;
 extern int show_kangaroo;
 extern int show_rhino;
-Ppmimage *startImage;
 extern GLuint StartTexture;
 #define MAXBUTTONS 8
 
