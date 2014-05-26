@@ -39,6 +39,7 @@ void mouse_click(int action)
                         //user clicked TOP button (start game)
                         start = 0;
                         rhinoReset();
+                        animalReset();
                         kangarooReset();
                     }
                     if (i==1) {

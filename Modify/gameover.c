@@ -19,6 +19,7 @@ void GameOver(void)
 {
     show_kangaroo = 0;
     show_rhino = 0;
+    show_animal = 0;
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, GameOverTexture);
     glBegin(GL_QUADS);
