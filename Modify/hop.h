@@ -7,7 +7,7 @@ extern Ppmimage *lowhopImage;
 extern Ppmimage *highhopImage;
 //extern Ppmimage *punch3Image;
 extern GLuint lowhopTexture;
-extern GLuint lowhopTexture;
+extern GLuint highhopTexture;
 //extern GLuint punch3Texture;
 extern unsigned char *Transparent;
 extern int hop;

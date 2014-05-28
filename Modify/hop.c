@@ -14,7 +14,8 @@
 void init_hop_texture(int w2, int h2)
 {
     lowhopImage      = ppm6GetImage("./images/prephop.ppm");
-    highhoprightImage      = ppm6GetImage("./images/hop.ppm");
+    highhopImage      = ppm6GetImage("./images/hop.ppm");
+
     /*punch3Image      = ppm6GetImage("./images/3punch.ppm");*/
     //
     //create opengl texture elements
