@@ -148,20 +148,21 @@ GLuint punchrightTexture;
 GLuint GameOverTexture; //-------------------------------------------------
 
 //variables
-int done;
-int lbutton = 0;
-int rbutton = 0;
-int nbuttons = 0;
-int show_rhino = 0;
-int show_animal = 0;
-int show_kangaroo = 1;
-int show_ufo = 0;
-int background = 1;
-int start = 1;
-int white = 0;
-int gameover = 1; //--------------------------------------------------------
-int lives = 3;
-int high_score = 0;    // high score tracker, prints in render()
+int done = 0;
+int lbutton;
+int rbutton;
+int nbuttons;
+int show_rhino=0;
+int show_animal=0;
+int show_kangaroo=1;
+int background=1;
+int start=1;
+int white=0;
+int gameover=1; //--------------------------------------------------------
+int show_ufo=0;
+int high_score=0;    // high score tracker, prints in render()
+int lives=3;
+int punch = 0;
 int punch_image = 0;
 static double setLevel = 0.0;
 static double setMountain = 0.0;
@@ -604,7 +605,8 @@ void check_keys(XEvent *e)
             }
             break;
         case XK_space:
-            punch_image+=1;
+            //punch_image+=1;
+            punch ^= 1;
             fmod_playsound(2);
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
@@ -675,6 +677,15 @@ void physics(void)
 {
     Flt d0,d1,dist;
     Flt hit_dist;
+
+    if (punch) {
+        punch_image += 1;
+        if (punch_image == 1) {
+            punch_image = 0;
+            punch ^= 1;
+        }
+    }
+
     if (show_rhino) {
         move_rhino();
         hit_dist = rhino.pos[0] - 100.0;
@@ -685,6 +696,7 @@ void physics(void)
             kangarooDeath();
         }
     }
+
     if (show_animal) {
         move_animal();
         hit_dist = animal.pos[0] - 100.0;
@@ -695,6 +707,7 @@ void physics(void)
             kangarooDeath();
         }
     }
+
     if (show_ufo)
         move_ufo();
     /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
