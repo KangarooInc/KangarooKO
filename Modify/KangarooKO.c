@@ -65,6 +65,7 @@ GLXContext glc;
 //function prototypes
 void initXWindows(void);
 void init_opengl(void);
+void setup_screen_res(const int, const int);
 void cleanupXWindows(void);
 void check_resize(XEvent *e);
 void check_mouse(XEvent *e);
@@ -148,19 +149,19 @@ GLuint GameOverTexture; //-------------------------------------------------
 
 //variables
 int done;
-int lbutton;
-int rbutton;
-int nbuttons;
-int show_rhino=0;
-int show_animal=0;
-int show_kangaroo=1;
-int background=1;
-int start=1;
-int white=0;
-int gameover=1; //--------------------------------------------------------
-int show_ufo=0;
-int high_score=0;    // high score tracker, prints in render()
-int lives=3;
+int lbutton = 0;
+int rbutton = 0;
+int nbuttons = 0;
+int show_rhino = 0;
+int show_animal = 0;
+int show_kangaroo = 1;
+int show_ufo = 0;
+int background = 1;
+int start = 1;
+int white = 0;
+int gameover = 1; //--------------------------------------------------------
+int lives = 3;
+int high_score = 0;    // high score tracker, prints in render()
 int punch_image = 0;
 static double setLevel = 0.0;
 static double setMountain = 0.0;
@@ -207,18 +208,6 @@ int main(void)
 #endif //USE_SOUND
     logClose();
     return 0;
-}
-
-void reshape_window(int width, int height)
-{
-    //window has been resized.
-    setup_screen_res(width, height);
-    //
-    glViewport(0, 0, (GLint)width, (GLint)height);
-    glMatrixMode(GL_PROJECTION); glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-    glOrtho(0, xres, 0, yres, -1, 1);
-    set_title();
 }
 
 unsigned char *buildAlphaData(Ppmimage *img)
@@ -307,6 +296,28 @@ void init_opengl(void)
 
     //-------------------------------------------------------------------------
     //
+    // Kangaroo
+    //
+    int w = kangarooImage->width;
+    int h = kangarooImage->height;
+
+    glBindTexture(GL_TEXTURE_2D, KangarooTexture);
+    //
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    //
+    //must build a new set of data...
+    unsigned char *Transparent = buildAlphaData(kangarooImage);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);
+    //-------------------------------------------------------------------------
+    //
+    // Kangaroo - Punch
+    //
+    init_punch_texture(w,h);
+    //-------------------------------------------------------------------------
+    //
     // Rhino
     //
     int w1 = rhinoImage->width;
@@ -318,7 +329,7 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     //
     //must build a new set of data...
-    unsigned char *Transparent = buildAlphaData(rhinoImage);
+    Transparent = buildAlphaData(rhinoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w1, h1, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
     free(Transparent);
@@ -356,29 +367,6 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w3, h3, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
     free(Transparent);
-    //-------------------------------------------------------------------------
-    //
-    // Kangaroo
-    //
-    int w = kangarooImage->width;
-    int h = kangarooImage->height;
-
-    glBindTexture(GL_TEXTURE_2D, KangarooTexture);
-    //
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    //
-    //must build a new set of data...
-    Transparent = buildAlphaData(kangarooImage);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
-    free(Transparent);
-
-    //-------------------------------------------------------------------------
-    //
-    // Kangaroo - Punch
-    //
-    init_punch_texture(w,h);
     //-------------------------------------------------------------------------
     //
     // Background - Platforms
@@ -443,19 +431,6 @@ void init_opengl(void)
     //-------------------------------------------------------------------------
 }
 
-void check_resize(XEvent *e)
-{
-    //The ConfigureNotify is sent by the
-    //server if the window is resized.
-    if (e->type != ConfigureNotify)
-        return;
-    XConfigureEvent xce = e->xconfigure;
-    if (xce.width != xres || xce.height != yres) {
-        //Window size did change.
-        reshape_window(xce.width, xce.height);
-    }
-}
-
 void init_sounds(void)
 {
 #ifdef USE_SOUND
@@ -477,7 +452,7 @@ void init_sounds(void)
         return;
     }
     fmod_setmode(1,FMOD_LOOP_NORMAL);
-    /*fmod_playsound(1);*/
+    fmod_playsound(1);
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -702,7 +677,7 @@ void physics(void)
     Flt hit_dist;
     if (show_rhino) {
         move_rhino();
-        hit_dist = rhino.pos[0] - 50.0;
+        hit_dist = rhino.pos[0] - 100.0;
         d0 = kangaroo.pos[0] - hit_dist;
         d1 = kangaroo.pos[1] - rhino.pos[1];
         dist = d0*d0+d1*d1;
@@ -712,7 +687,7 @@ void physics(void)
     }
     if (show_animal) {
         move_animal();
-        hit_dist = animal.pos[0] - 50.0;
+        hit_dist = animal.pos[0] - 100.0;
         d0 = kangaroo.pos[0] - hit_dist;
         d1 = kangaroo.pos[1] - animal.pos[1];
         dist = d0*d0+d1*d1;
@@ -723,9 +698,9 @@ void physics(void)
     if (show_ufo)
         move_ufo();
     /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
-    {
-        kangarooDeath();
-    }*/
+      {
+      kangarooDeath();
+      }*/
 }
 
 void draw_kangaroo(void)
@@ -1031,8 +1006,10 @@ void render(void)
         }
     }
     /////////////////////////////////////////////////////////
-    if (show_ufo) {
+    if (high_score >= 1000) {
         draw_ufo(wid);
+
+            show_ufo = 1;
     }
 
 
