@@ -152,22 +152,6 @@ GLuint highhopTexture;
 GLuint GameOverTexture; //-------------------------------------------------
 
 //variables
-<<<<<<< HEAD
-int done = 0;
-int lbutton;
-int rbutton;
-int nbuttons;
-int show_rhino=0;
-int show_animal=0;
-int show_kangaroo=1;
-int background=1;
-int start=1;
-int white=0;
-int gameover=1; //--------------------------------------------------------
-int show_ufo=0;
-int high_score=0;    // high score tracker, prints in render()
-int lives=3;
-=======
 int done;
 int lbutton = 0;
 int rbutton = 0;
@@ -182,7 +166,6 @@ int white = 0;
 int gameover = 1; //--------------------------------------------------------
 int lives = 3;
 int high_score = 0;    // high score tracker, prints in render()
->>>>>>> Jose
 int punch = 0;
 int punch_image = 0;
 int hop = 0;
@@ -481,7 +464,7 @@ void init_sounds(void)
         return;
     }
     fmod_setmode(1,FMOD_LOOP_NORMAL);
-    fmod_playsound(1);
+    /*fmod_playsound(1);*/
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -631,11 +614,7 @@ void check_keys(XEvent *e)
             }
             break;
         case XK_space:
-<<<<<<< HEAD
-            //punch_image+=1;
-=======
             /*punch_image+=1;*/
->>>>>>> Jose
             punch ^= 1;
             fmod_playsound(2);
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
@@ -708,24 +687,16 @@ void physics(void)
     Flt d0,d1,dist;
     Flt hit_dist;
 
-<<<<<<< HEAD
-    if (punch) {
-        punch_image += 1;
-        if (punch_image == 1) {
-=======
     if(punch)
     {
         punch_image += 1;
         if(punch_image == 3)
         {
->>>>>>> Jose
             punch_image = 0;
             punch ^= 1;
         }
     }
 
-<<<<<<< HEAD
-=======
     if(hop)
     {
         hop_image += 1;
@@ -736,7 +707,6 @@ void physics(void)
         }
     }
 
->>>>>>> Jose
     if (show_rhino) {
         move_rhino();
         hit_dist = rhino.pos[0] - 100.0;
