@@ -28,6 +28,7 @@
 #include "gameover.h"
 #include "startmenu.h"
 #include "punch.h"
+#include "hop.h"
 
 #define USE_SOUND
 
@@ -121,11 +122,12 @@ typedef struct t_kangaroo {
 } Kangaroo;
 Kangaroo kangaroo;
 
-//opengl stuff
 Ppmimage *kangarooImage=NULL;
 Ppmimage *punchleftImage = NULL;
 Ppmimage *punchrightImage = NULL;
 //Ppmimage *punch3Image = NULL;
+Ppmimage *lowhopImage;
+Ppmimage *highhopImage;
 Ppmimage *levelImage=NULL;
 Ppmimage *mountainsImage=NULL;
 Ppmimage *startImage=NULL;
@@ -144,6 +146,8 @@ GLuint StartTexture;
 GLuint WhiteTexture;
 GLuint punchleftTexture;
 GLuint punchrightTexture;
+GLuint lowhopTexture;
+GLuint highhopTexture;
 //GLuint punch3Texture;
 GLuint GameOverTexture; //-------------------------------------------------
 
@@ -162,7 +166,10 @@ int white = 0;
 int gameover = 1; //--------------------------------------------------------
 int lives = 3;
 int high_score = 0;    // high score tracker, prints in render()
+int punch = 0;
 int punch_image = 0;
+int hop = 0;
+int hop_image = 0;
 static double setLevel = 0.0;
 static double setMountain = 0.0;
 #ifdef USE_SOUND
@@ -316,6 +323,11 @@ void init_opengl(void)
     // Kangaroo - Punch
     //
     init_punch_texture(w,h);
+    //-------------------------------------------------------------------------
+    //
+    // Kangaroo - Hop
+    //
+    init_hop_texture(w,h);
     //-------------------------------------------------------------------------
     //
     // Rhino
@@ -573,22 +585,20 @@ void check_keys(XEvent *e)
         case XK_k:
             lives += 1;
             break;
-        case XK_t:
-            printf("PhysicsRate: %f\n PhysicsCountdown: %f\n",physicsRate, physicsCountdown) ;
-            break;
         case XK_l:
             lives -= lives;
             break;
         case XK_Left:
             if (!(kangaroo.pos[0] - kangaroo.width2 < (xres-xres))) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[0] -= 50.0;
+                kangaroo.pos[0] -= 67.0;
             }
             break;
         case XK_Right:
             if (!(kangaroo.pos[0] + kangaroo.width2 >= xres)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
-                kangaroo.pos[0] += 50.0;
+                hop ^= 1;
+                kangaroo.pos[0] += 67.0;
             }
             break;
         case XK_Up:
@@ -604,7 +614,8 @@ void check_keys(XEvent *e)
             }
             break;
         case XK_space:
-            punch_image+=1;
+            /*punch_image+=1;*/
+            punch ^= 1;
             fmod_playsound(2);
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
@@ -675,6 +686,27 @@ void physics(void)
 {
     Flt d0,d1,dist;
     Flt hit_dist;
+
+    if(punch)
+    {
+        punch_image += 1;
+        if(punch_image == 3)
+        {
+            punch_image = 0;
+            punch ^= 1;
+        }
+    }
+
+    if(hop)
+    {
+        hop_image += 1;
+        if(hop_image == 3)
+        {
+            hop_image = 0;
+            hop ^= 1;
+        }
+    }
+
     if (show_rhino) {
         move_rhino();
         hit_dist = rhino.pos[0] - 100.0;
@@ -901,6 +933,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
             }
             else if (animal.pos[1] >= rhino.pos[1]){
@@ -913,6 +946,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
             }
         }
@@ -926,6 +960,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
                 if (show_animal) {
                     draw_animal(wid);
@@ -935,6 +970,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
                 if (show_animal) {
                     draw_animal(wid);
@@ -955,6 +991,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
                 if (show_animal) {
                     draw_animal(wid);
@@ -967,6 +1004,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
                 if (show_rhino) {
                     draw_rhino(wid);
@@ -986,6 +1024,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
                 if (show_rhino) {
                     draw_rhino(wid);
@@ -1001,6 +1040,7 @@ void render(void)
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
+                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
             }
         }
@@ -1024,7 +1064,7 @@ void render(void)
     r.bot = yres - 20;
     r.left = 10;
     r.center = 0;
-    unsigned int cref = 0x00000000;
+    unsigned int cref = 0x00ffffff;
 
     if(start)
     {
