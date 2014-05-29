@@ -282,12 +282,12 @@ void init_opengl(void)
     //
     kangarooImage    = ppm6GetImage("./images/ricky.ppm");
     levelImage       = ppm6GetImage("./images/LevelBlack.ppm");
-    mountainsImage  = ppm6GetImage("./images/BackBlack.ppm");
+    mountainsImage   = ppm6GetImage("./images/BackBlack.ppm");
     startImage       = ppm6GetImage("./images/blank.ppm");
     whiteImage       = ppm6GetImage("./images/white.ppm");
     gameoverImage    = ppm6GetImage("./images/gameover.ppm"); //-------------------------------------------------------
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
-    animalImage       = ppm6GetImage("./images/altrhino.ppm");
+    animalImage      = ppm6GetImage("./images/altrhino.ppm");
     ufoImage	     = ppm6GetImage("./images/ufo.ppm");
     //
     //create opengl texture elements
@@ -451,10 +451,10 @@ void init_sounds(void)
         printf("ERROR - fmod_init()\n\n");
         return;
     }
-    /*if (fmod_createsound("./sounds/Intro.mp3", 0)) {
-      printf("ERROR - fmod_createsound()\n\n");
-      return;
-      }*/
+    if (fmod_createsound("./sounds/Intro Quack.mp3", 0)) {
+        printf("ERROR - fmod_createsound()\n\n");
+        return;
+    }
     if (fmod_createsound("./sounds/KillingJokeIntro.mp3", 1)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
@@ -463,8 +463,8 @@ void init_sounds(void)
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    fmod_setmode(1,FMOD_LOOP_NORMAL);
-    fmod_playsound(1);
+    fmod_setmode(0,FMOD_LOOP_NORMAL);
+    fmod_playsound(0);
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -591,6 +591,7 @@ void check_keys(XEvent *e)
         case XK_Left:
             if (!(kangaroo.pos[0] - kangaroo.width2 < (xres-xres))) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
+                hop ^= 1;
                 kangaroo.pos[0] -= 67.0;
             }
             break;
@@ -604,12 +605,14 @@ void check_keys(XEvent *e)
         case XK_Up:
             if (!(kangaroo.pos[1] >= (float)yres/2)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
+                hop ^= 1;
                 kangaroo.pos[1] += 67.0;
             }
             break;
         case XK_Down:
             if (!(kangaroo.pos[1] < 100.0)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
+                hop ^= 1;
                 kangaroo.pos[1] -= 67.0;
             }
             break;
@@ -617,11 +620,12 @@ void check_keys(XEvent *e)
             /*punch_image+=1;*/
             punch ^= 1;
             fmod_playsound(2);
+
             punch_dist = kangaroo.pos[0] + kangaroo.height2;
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 0 && (hit_dist - punch_dist <= 50.0))
+                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 90.0))
                 {
                     if (show_rhino) {
                         rhinoReset();
@@ -632,7 +636,7 @@ void check_keys(XEvent *e)
             hit_dist = animal.pos[0] - animal.height2;
             if (animal.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && animal.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 0 && (hit_dist - punch_dist <= 50.0))
+                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 90.0))
                 {
                     if (show_animal) {
                         animalReset();
@@ -776,6 +780,7 @@ void draw_rhino(float wid)
     glPopMatrix();
     glDisable(GL_ALPHA_TEST);
 }
+
 void draw_animal(float wid)
 {
     glPushMatrix();
@@ -1049,7 +1054,7 @@ void render(void)
     if (high_score >= 1000) {
         draw_ufo(wid);
 
-            show_ufo = 1;
+        show_ufo = 1;
     }
 
 

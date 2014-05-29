@@ -134,7 +134,7 @@ void buttonRender (void)
             glLineWidth(1);
         }
         if (button[i].down) {
-            glColor3fv(button[i].dcolor);
+            glColor3fv(button[i].color);
         } else {
             glColor3fv(button[i].color);
         }
