@@ -29,6 +29,7 @@
 #include "startmenu.h"
 #include "punch.h"
 #include "hop.h"
+#include "MiniGame.h"
 
 #define USE_SOUND
 
@@ -135,7 +136,11 @@ Ppmimage *whiteImage=NULL;
 Ppmimage *rhinoImage=NULL;
 Ppmimage *animalImage=NULL;
 Ppmimage *ufoImage=NULL;
-Ppmimage *gameoverImage=NULL; //------------------------------------------------
+Ppmimage *gameoverImage=NULL; //---------------------
+Ppmimage *car1Image=NULL;
+Ppmimage *car2Image=NULL;
+Ppmimage *car3Image=NULL;
+Ppmimage *backroundImage=NULL;
 GLuint KangarooTexture;
 GLuint RhinoTexture;
 GLuint AnimalTexture;
@@ -149,7 +154,11 @@ GLuint punchrightTexture;
 GLuint lowhopTexture;
 GLuint highhopTexture;
 //GLuint punch3Texture;
-GLuint GameOverTexture; //-------------------------------------------------
+GLuint GameOverTexture; //------------------------
+GLuint minitexture;
+GLuint car1texture;
+GLuint car2texture;
+GLuint car3texture;
 
 //variables
 int done;
@@ -163,13 +172,15 @@ int show_ufo = 0;
 int background = 1;
 int start = 1;
 int white = 0;
-int gameover = 1; //--------------------------------------------------------
+int gameover = 1; //------------------
 int lives = 3;
 int high_score = 0;    // high score tracker, prints in render()
 int punch = 0;
 int punch_image = 0;
 int hop = 0;
 int hop_image = 0;
+int show_MiniGame=0;
+int show_car=0;
 static double setLevel = 0.0;
 static double setMountain = 0.0;
 #ifdef USE_SOUND
@@ -329,6 +340,8 @@ void init_opengl(void)
     //
     init_hop_texture(w,h);
     //-------------------------------------------------------------------------
+    // MiniGame BackGround
+    init_MiniGame();
     //
     // Rhino
     //
