@@ -1086,6 +1086,13 @@ void render(void)
         show_ufo = 1;
     }
 
+    if (high_score >= 5000) {
+        show_MiniGame = 1;
+    }
+
+    if (show_MiniGame) {
+        mini_render();
+    }
 
     glDisable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
