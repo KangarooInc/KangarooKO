@@ -1,12 +1,4 @@
-//cs335 Spring 2014
-//
-//program: lab2_rainforest.c
-//author:  Gordon Griesel
-//date:    2014
-//
-//Must add code to remove a raindrop node from the linked-list
-//when it stops or leaves the screen.
-//
+//Kangaroo KO
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -908,7 +900,6 @@ void draw_background(void)
     glTexCoord2f(1.0f, 1.0f); glVertex2i(xres*5, 0);
     glEnd();
     glPopMatrix();
-
 }
 
 void perspective(void)
