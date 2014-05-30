@@ -23,3 +23,4 @@ Things Fixed :^D :
 *Show highscore on the game over screen 
 
 *** Signifies powerups
+SHSAFOFDJA:SLFAS:LKF:ASLDAKS:LKG:LASKFA
