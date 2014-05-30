@@ -908,6 +908,7 @@ void draw_background(void)
     glTexCoord2f(1.0f, 1.0f); glVertex2i(xres*5, 0);
     glEnd();
     glPopMatrix();
+
 }
 
 void perspective(void)
