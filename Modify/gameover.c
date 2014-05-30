@@ -17,9 +17,15 @@
 
 void GameOver(void)
 {
+    Rect r;
+    r.bot = yres - 100;
+    r.left = xres/2;
+    r.center = 1;
+    unsigned int cref = 0x00ffffff;
     show_kangaroo = 0;
     show_rhino = 0;
     show_animal = 0;
+
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, GameOverTexture);
     glBegin(GL_QUADS);
@@ -29,7 +35,7 @@ void GameOver(void)
     glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
     glEnd();
     glPopMatrix();
-
+    ggprint16(&r, 16, cref, "High Score: %i", high_score);
     GObuttonsInit();
     bRender();
 }
@@ -137,13 +143,13 @@ void GObuttonsInit(void)
     strcpy(GObutton[nbuttons].text, "Retry");
     GObutton[nbuttons].down = 0;
     GObutton[nbuttons].click = 0;
-    GObutton[nbuttons].color[0] = 0.4f;
-    GObutton[nbuttons].color[1] = 0.4f;
-    GObutton[nbuttons].color[2] = 0.7f;
+    GObutton[nbuttons].color[0] = 1.0f;
+    GObutton[nbuttons].color[1] = 1.0f;
+    GObutton[nbuttons].color[2] = 1.0f;
     GObutton[nbuttons].dcolor[0] = GObutton[nbuttons].color[0] * 0.5f;
     GObutton[nbuttons].dcolor[1] = GObutton[nbuttons].color[1] * 0.5f;
     GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
-    GObutton[nbuttons].text_color = 0x00ffffff;
+    GObutton[nbuttons].text_color = 0x00000000;
     nbuttons++;
     //
     // Quit button
@@ -159,13 +165,13 @@ void GObuttonsInit(void)
     strcpy(GObutton[nbuttons].text, "Quit");
     GObutton[nbuttons].down = 0;
     GObutton[nbuttons].click = 0;
-    GObutton[nbuttons].color[0] = 0.4f;
-    GObutton[nbuttons].color[1] = 0.4f;
-    GObutton[nbuttons].color[2] = 0.7f;
+    GObutton[nbuttons].color[0] = 1.0f;
+    GObutton[nbuttons].color[1] = 1.0f;
+    GObutton[nbuttons].color[2] = 1.0f;
     GObutton[nbuttons].dcolor[0] = GObutton[nbuttons].color[0] * 0.5f;
     GObutton[nbuttons].dcolor[1] = GObutton[nbuttons].color[1] * 0.5f;
     GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
-    GObutton[nbuttons].text_color = 0x00ffffff;
+    GObutton[nbuttons].text_color = 0x00000000;
     nbuttons++;
 }
 
