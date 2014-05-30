@@ -27,8 +27,8 @@
 #include "xwin.h"
 #include "gameover.h"
 #include "startmenu.h"
-#include "punch.h"
-#include "hop.h"
+#include "bjarne.h"
+//#include "hop.h"
 #include "minigame.h"
 
 #define USE_SOUND
