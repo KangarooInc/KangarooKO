@@ -176,7 +176,7 @@ static double setMountain = 0.0;
 int play_sounds = 1;
 #endif //USE_SOUND
 //
-static time_t seconds;
+//static time_t seconds;
 
 int main(void)
 {
@@ -731,10 +731,7 @@ void physics(void)
 
     if (show_ufo)
         move_ufo();
-    /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
-      {
-      kangarooDeath();
-      }*/
+
 }
 
 void draw_kangaroo(void)
