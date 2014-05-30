@@ -155,7 +155,7 @@ GLuint punchrightTexture;
 GLuint lowhopTexture;
 GLuint highhopTexture;
 //GLuint punch3Texture;
-GLuint GameOverTexture;
+GLuint GameOverTexture; //------------------------
 GLuint minitexture;
 GLuint car1texture;
 GLuint car2texture;
@@ -176,7 +176,7 @@ int punch_count = 0;
 int background = 1;
 int start = 1;
 int white = 0;
-int gameover = 1;
+int gameover = 1; //------------------
 int lives = 3;
 int high_score = 0;    // high score tracker, prints in render()
 int punch = 0;
@@ -190,7 +190,7 @@ static double setMountain = 0.0;
 int play_sounds = 1;
 #endif //USE_SOUND
 //
-static time_t seconds;
+//static time_t seconds;
 
 int main(void)
 {
@@ -343,6 +343,8 @@ void init_opengl(void)
     //
     init_hop_texture(w,h);
     //-------------------------------------------------------------------------
+    // MiniGame BackGround
+    init_MiniGame();
     //
     // Rhino
     //
@@ -759,10 +761,7 @@ void physics(void)
 
     if (show_ufo)
         move_ufo();
-    /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
-      {
-      kangarooDeath();
-      }*/
+
 }
 
 void draw_kangaroo(void)
