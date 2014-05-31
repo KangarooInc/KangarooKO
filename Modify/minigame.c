@@ -88,7 +88,7 @@ void init_MiniGame()
 void mini_render(void)
 {
     if(show_MiniGame) {
-
+        show_car= 1;
         glPushMatrix();
         glBindTexture(GL_TEXTURE_2D,minitexture);
         glBegin(GL_QUADS);
@@ -101,6 +101,7 @@ void mini_render(void)
 
         if(show_car) {
 
+            if (punch_count >= 0) {
             glPushMatrix();
             glBindTexture(GL_TEXTURE_2D,car1texture);
             glBegin(GL_QUADS);
@@ -110,6 +111,7 @@ void mini_render(void)
             glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
             glEnd();
             glPopMatrix();
+            }
 
             if(punch_count == 40) {
                 glPushMatrix();
