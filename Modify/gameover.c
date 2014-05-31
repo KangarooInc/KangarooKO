@@ -14,6 +14,7 @@
 #include "gameover.h"
 #include "ppm.h"
 #include "xwin.h"
+#include "Jose.h"
 
 void GameOver(void)
 {

@@ -1,13 +1,3 @@
-//cs335 Spring 2014
-//
-//program: lab2_rainforest.c
-//author:  Gordon Griesel
-//date:    2014
-//
-//Must add code to remove a raindrop node from the linked-list
-//when it stops or leaves the screen.
-//
-//
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,10 +16,10 @@
 #include "timing.h"
 #include "xwin.h"
 #include "gameover.h"
-#include "startmenu.h"
 #include "punch.h"
 #include "hop.h"
-#include "minigame.h"
+#include "struct.h"
+#include "Jose.h"
 
 #define USE_SOUND
 
@@ -41,7 +31,6 @@
 
 //defined types
 typedef double Flt;
-typedef double Vec[3];
 typedef Flt	Matrix[4][4];
 
 //macros
@@ -70,59 +59,16 @@ void init_opengl(void);
 void setup_screen_res(const int, const int);
 void cleanupXWindows(void);
 void check_resize(XEvent *e);
-void check_mouse(XEvent *e);
 void GOcheck_mouse(XEvent *e);
 void check_keys(XEvent *e);
 void init();
 void init_sounds(void);
 void physics(void);
 void render(void);
-void restartGame();
 void rhinoReset(void);
 void animalReset(void);
 void kangarooReset(void);
 void kangarooDeath(void);
-void draw_kangaroo(void);
-void draw_rhino(void);
-void draw_animal(void);
-void draw_ufo(void);
-void draw_background(void);
-void draw_white(void);
-void perspective(void);
-
-//structures
-typedef struct t_rhino {
-    Vec pos;
-    Vec vel;
-    float height;
-    float height2;
-} Rhino;
-Rhino rhino;
-
-typedef struct t_animal {
-    Vec pos;
-    Vec vel;
-    float height;
-    float height2;
-} Animal;
-Animal animal;
-
-typedef struct t_ufo {
-    Vec pos;
-    Vec vel;
-} Ufo;
-Ufo ufo;
-
-typedef struct t_kangaroo {
-    int shape;
-    Vec pos;
-    Vec lastpos;
-    float width;
-    float width2;
-    float height;
-    float height2;
-} Kangaroo;
-Kangaroo kangaroo;
 
 Ppmimage *kangarooImage=NULL;
 Ppmimage *punchleftImage = NULL;
@@ -156,7 +102,6 @@ GLuint lowhopTexture;
 GLuint highhopTexture;
 //GLuint punch3Texture;
 GLuint GameOverTexture;
-GLuint minitexture;
 GLuint car1texture;
 GLuint car2texture;
 GLuint car3texture;
@@ -171,8 +116,6 @@ int show_animal = 0;
 int show_kangaroo = 1;
 int show_ufo = 0;
 int show_car = 0;
-int show_MiniGame = 0;
-int punch_count = 0;
 int background = 1;
 int start = 1;
 int white = 0;
@@ -184,8 +127,9 @@ int punch_image = 0;
 int hop = 0;
 int hop_image = 0;
 float wid = 120.0f;
-static double setLevel = 0.0;
-static double setMountain = 0.0;
+double setLevel;
+double setMountain;
+
 #ifdef USE_SOUND
 int play_sounds = 1;
 #endif //USE_SOUND
@@ -423,11 +367,6 @@ void init_opengl(void)
     free(Transparent);
     //-------------------------------------------------------------------------
     //
-    // Background - Mini Game
-    //
-    init_MiniGame();
-    //-------------------------------------------------------------------------
-    //
     // Start Page
     //
     glBindTexture(GL_TEXTURE_2D, StartTexture);
@@ -483,7 +422,7 @@ void init_sounds(void)
         return;
     }
     fmod_setmode(0,FMOD_LOOP_NORMAL);
-    fmod_playsound(0);
+    /*fmod_playsound(0);*/
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -510,15 +449,6 @@ void init() {
 
     MakeVector(300.0,600.0,0.0, ufo.pos);
     MakeVector(0.0,-6.0,0.0, ufo.vel);
-}
-
-void restartGame()
-{
-    lives = 3;
-    high_score = 0;
-    rhinoReset();
-    animalReset();
-    kangarooReset();
 }
 
 void rhinoReset(void)
@@ -595,7 +525,7 @@ void check_keys(XEvent *e)
           start = 0;
           break;
           */
-        case XK_a:
+        case XK_u:
             show_ufo ^= 1;
             break;
         case XK_j:
@@ -607,6 +537,7 @@ void check_keys(XEvent *e)
         case XK_l:
             lives -= lives;
             break;
+        case XK_a:
         case XK_Left:
             if (!(kangaroo.pos[0] - kangaroo.width2 < (xres-xres))) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
@@ -614,6 +545,7 @@ void check_keys(XEvent *e)
                 kangaroo.pos[0] -= 67.0;
             }
             break;
+        case XK_d:
         case XK_Right:
             if (!(kangaroo.pos[0] + kangaroo.width2 >= xres)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
@@ -621,6 +553,7 @@ void check_keys(XEvent *e)
                 kangaroo.pos[0] += 67.0;
             }
             break;
+        case XK_w:
         case XK_Up:
             if (!(kangaroo.pos[1] >= (float)yres/2)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
@@ -628,6 +561,7 @@ void check_keys(XEvent *e)
                 kangaroo.pos[1] += 67.0;
             }
             break;
+        case XK_s:
         case XK_Down:
             if (!(kangaroo.pos[1] < 100.0)) {
                 VecCopy(kangaroo.pos, kangaroo.lastpos);
@@ -664,10 +598,6 @@ void check_keys(XEvent *e)
                 }
             }
 
-            if(show_MiniGame)
-            {
-                punch_count++;
-            }
             break;
         case XK_Escape:
             done=1;
@@ -761,285 +691,6 @@ void physics(void)
       {
       kangarooDeath();
       }*/
-}
-
-void draw_kangaroo(void)
-{
-    //Log("draw_kangaroo()...\n");
-    glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-    glPushMatrix();
-    glTranslatef(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glBindTexture(GL_TEXTURE_2D, KangarooTexture);
-    glBegin(GL_QUADS);
-    float w = kangaroo.width2;
-    glTexCoord2f(0.0f, 0.0f); glVertex2f(-w,  w);
-    glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  w);
-    glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -w);
-    glTexCoord2f(0.0f, 1.0f); glVertex2f(-w, -w);
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_ALPHA_TEST);
-    glPopMatrix();
-}
-
-void draw_rhino(void)
-{
-    glPushMatrix();
-    glTranslatef(rhino.pos[0], rhino.pos[1], rhino.pos[2]);
-
-    glBindTexture(GL_TEXTURE_2D, RhinoTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glBegin(GL_QUADS);
-    //This is for the rhino image going right to left
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-    //#################################################
-    glEnd();
-    glPopMatrix();
-    glDisable(GL_ALPHA_TEST);
-}
-
-void draw_animal(void)
-{
-    glPushMatrix();
-    glTranslatef(animal.pos[0], animal.pos[1], animal.pos[2]);
-
-    glBindTexture(GL_TEXTURE_2D, AnimalTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glBegin(GL_QUADS);
-    //This is for the animal image going right to left
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-    //#################################################
-    glEnd();
-    glPopMatrix();
-    glDisable(GL_ALPHA_TEST);
-}
-
-void draw_ufo(void)
-{
-    glPushMatrix();
-    glTranslatef(ufo.pos[0], ufo.pos[1], ufo.pos[2]);
-    glBindTexture(GL_TEXTURE_2D, UFOTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glBegin(GL_QUADS);
-    if (ufo.vel[0] > 0.0) {
-        glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
-    } else {
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-    }
-    glEnd();
-    glPopMatrix();
-    glDisable(GL_ALPHA_TEST);
-}
-
-void draw_white(void)
-{
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, WhiteTexture);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
-    glEnd();
-    glPopMatrix();
-}
-
-void draw_background(void)
-{
-    double *yOFFsetLevel = &setLevel;
-    double *yOFFsetMountain = &setMountain;
-
-    if(!start)
-    {
-        *yOFFsetLevel -= 1;
-        /*if(*yOFFsetLevel>100.0)*/
-        /**yOFFsetLevel -=100.0;*/
-
-        *yOFFsetMountain -= .25;
-        /*if(*yOFFsetMountain>100.0)*/
-        /**yOFFsetMountain -=100.0;*/
-    }
-
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, MountainTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glTranslatef(*yOFFsetMountain, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres*5, yres);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres*5, 0);
-    glEnd();
-    glPopMatrix();
-
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, LevelTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glTranslatef(*yOFFsetLevel, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres*5, yres);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres*5, 0);
-    glEnd();
-    glPopMatrix();
-}
-
-void perspective(void)
-{
-
-    /////////////////////////////////////////////////////////////
-    //For the Perspective
-    if (kangaroo.pos[1] < rhino.pos[1])
-    {
-        if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
-                if (show_rhino) {
-                    draw_rhino();
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-            }
-            else if (animal.pos[1] >= rhino.pos[1]){
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_rhino) {
-                    draw_rhino();
-                }
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-            }
-        }
-
-        else if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
-                if (show_rhino) {
-                    draw_rhino();
-                }
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-            }
-            else if (animal.pos[1] >= rhino.pos[1]){
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_rhino) {
-                    draw_rhino();
-                }
-            }
-        }
-    }
-    //////////////////////////////////////////
-
-    else if (kangaroo.pos[1] >= rhino.pos[1])
-    {
-        if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_rhino) {
-                    draw_rhino();
-                }
-            }
-            else if (animal.pos[1] < rhino.pos[1]){
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-                if (show_rhino) {
-                    draw_rhino();
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-            }
-        }
-
-        else if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-                if (show_rhino) {
-                    draw_rhino();
-                }
-            }
-            else if (animal.pos[1] < rhino.pos[1]){
-                if (show_rhino) {
-                    draw_rhino();
-                }
-                if (show_animal) {
-                    draw_animal();
-                }
-                if (show_kangaroo) {
-                    draw_kangaroo();
-                    punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                    hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
-                }
-            }
-        }
-    }
 }
 
 void render(void)

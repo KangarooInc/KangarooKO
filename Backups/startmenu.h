@@ -1,8 +1,9 @@
 #ifndef _STARTMENU_H_
 #define _STARTMENU_H_
 
+#include <GL/glx.h>
 #include "fonts.h"
-#include "ppm.h"
+
 // Variables
 extern int done;
 extern int start;
@@ -20,10 +21,10 @@ extern GLuint StartTexture;
 void buttonsInit(void);
 void buttonRender (void);
 void mouse_click(int action);
-extern void rhinoReset(void);
-extern void animalReset(void);
-extern void kangarooReset(void);
-extern void StartMenu(void);
+void rhinoReset(void);
+void animalReset(void);
+void kangarooReset(void);
+void StartMenu(void);
 
 
 // Struct
