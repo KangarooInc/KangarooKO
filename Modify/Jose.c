@@ -1,3 +1,6 @@
+// Author: Jose Hernandez
+// Most of the code I worked on. Some left in Kangaroo.c
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,8 +9,7 @@
 #include "xwin.h"
 #include "Jose.h"
 #include "struct.h"
-#include "hop.h"
-#include "punch.h"
+#include "bjarne.h"
 
 extern double setLevel;
 extern double setMountain;
