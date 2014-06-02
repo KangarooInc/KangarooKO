@@ -632,7 +632,7 @@ void check_keys(XEvent *e)
             if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start)
                 lives = 5;
             break;
-        case XK_u:
+        case XK_Return:
             if(ufocount > 0 )
             {
                 if(!show_ufo) {
@@ -831,7 +831,7 @@ void render(void)
         ggprint16(&r, 16, cref, "Lives: %i", lives);
         ggprint16(&r, 16, cref, "High Score: %i", high_score);
         if(ufocount) {
-            ggprint16(&r, 16, cref, "UFO Help: %i", ufocount);
+            ggprint16(&r, 16, cref, "UFO Help (Press Enter): %i", ufocount);
         }
     }
 }
