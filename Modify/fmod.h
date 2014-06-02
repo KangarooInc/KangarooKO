@@ -1,6 +1,9 @@
 #ifndef MY_FMOD_H
 #define MY_FMOD_H
 
+#include <FMOD/fmod.h>
+#include <FMOD/fmod_errors.h>
+#include <stdio.h>
 #define NSOUNDS 3
 extern FMOD_CHANNEL *channel;
 extern int fmod_cleanup(void);

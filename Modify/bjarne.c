@@ -10,6 +10,7 @@
 #include <GL/glx.h>
 #include "ppm.h"
 #include "bjarne.h"
+#include "struct.h"
 
 void init_punch_texture(int w2, int h2)
 {
@@ -48,63 +49,72 @@ void init_punch_texture(int w2, int h2)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
     free(Transparent);
+    /*
+     *    //---------------------------------------------------------------
+     *    //punch 3
+     *
+     *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
+     *
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+     *    glTexImage2D(GL_TEXTURE_2D, 0, 3, w2, h2, 0,
+     *            GL_RGB, GL_UNSIGNED_BYTE, punch3Image->data);
+     *
+     *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
+     *    //
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+     *    //
+     *    //must build a new set of data
+     *    Transparent = buildAlphaData(punch3Image);
+     *    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
+     *            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+     *    free(Transparent);
+     */
+    //---------------------------------------------------------------
 }
 
 void punch_render(double x, double y, double z)
 {
-    float wid = 120.0f;
     if (show_kangaroo) {
 
         //punch_image += 1;
-        if (punch_image == 1) {
+        if (punch_image == 1 || punch_image == 2) {
+            glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
             glPushMatrix();
-
             glTranslatef(x, y, z);
+            glEnable(GL_ALPHA_TEST);
+            glAlphaFunc(GL_GREATER, 0.0f);
             glBindTexture(GL_TEXTURE_2D, punchleftTexture);
-            glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, 0.0f);
-            glColor4ub(255,255,255,255);
             glBegin(GL_QUADS);
-            //if (umbrella.vel[0] < 0.0) {
-            glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
-            glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-            glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
-            glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
-            /*} else {
-              glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-              glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-              glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-              glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-              }*/
+            float w = kangaroo.width2;
+            glTexCoord2f(0.0f, 0.0f); glVertex2f(-w,  w);
+            glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  w);
+            glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -w);
+            glTexCoord2f(0.0f, 1.0f); glVertex2f(-w, -w);
             glEnd();
-            glPopMatrix();
-            //
+            glBindTexture(GL_TEXTURE_2D, 0);
             glDisable(GL_ALPHA_TEST);
+            glPopMatrix();
         }
-        else if (punch_image == 2) {
-            glPushMatrix();
 
+        else if (punch_image == 3 || punch_image == 4) {
+            glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+            glPushMatrix();
             glTranslatef(x, y, z);
-            glBindTexture(GL_TEXTURE_2D, punchrightTexture);
             glEnable(GL_ALPHA_TEST);
             glAlphaFunc(GL_GREATER, 0.0f);
-            glColor4ub(255,255,255,255);
+            glBindTexture(GL_TEXTURE_2D, punchrightTexture);
             glBegin(GL_QUADS);
-            //if (umbrella.vel[0] < 0.0) {
-            glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
-            glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-            glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
-            glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
-            /*} else {
-              glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-              glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-              glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-              glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-              }*/
+            float w = kangaroo.width2;
+            glTexCoord2f(0.0f, 0.0f); glVertex2f(-w,  w);
+            glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  w);
+            glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -w);
+            glTexCoord2f(0.0f, 1.0f); glVertex2f(-w, -w);
             glEnd();
-            glPopMatrix();
-            //
+            glBindTexture(GL_TEXTURE_2D, 0);
             glDisable(GL_ALPHA_TEST);
+            glPopMatrix();
         }
         else {
             punch_image = 0;
@@ -209,6 +219,31 @@ void hop_render(double x, double y, double z)
             //
             glDisable(GL_ALPHA_TEST);
         }
+        /*else if (punch_image == 3) {
+          glPushMatrix();
+
+          glTranslatef(x, y, z);
+          glBindTexture(GL_TEXTURE_2D, punch3Texture);
+          glEnable(GL_ALPHA_TEST);
+          glAlphaFunc(GL_GREATER, 0.0f);
+          glColor4ub(255,255,255,255);
+          glBegin(GL_QUADS);
+        //if (umbrella.vel[0] < 0.0) {
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
+        [>} else {
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
+        //}<]
+        glEnd();
+        glPopMatrix();
+        //
+        glDisable(GL_ALPHA_TEST);
+        }*/
         else {
             hop_image = 0;
         }
