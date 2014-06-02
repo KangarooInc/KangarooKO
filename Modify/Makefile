@@ -4,8 +4,8 @@ LFLAGS = $(LIB) -lrt -lX11 -lGLU -lGL -pthread -lm #-lXrandr
 
 all: KangarooKO
 
-KangarooKO: KangarooKO.c timing.c xwin.c ppm.c fmod.c log.c gameover.c punch.c hop.c Jose.c
-	gcc $(CFLAGS) KangarooKO.c timing.c xwin.c ppm.c log.c fmod.c gameover.c punch.c hop.c Jose.c  -Wall -Wextra $(LFLAGS) -o KangarooKO
+KangarooKO: KangarooKO.c timing.c xwin.c ppm.c fmod.c log.c punch.c hop.c Jose.c Gabe.c Iggy.c
+	gcc $(CFLAGS) KangarooKO.c timing.c xwin.c ppm.c log.c fmod.c punch.c hop.c Jose.c Gabe.c Iggy.c -Wall -Wextra $(LFLAGS) -o KangarooKO
 
 clean:
 	rm -f KangarooKO

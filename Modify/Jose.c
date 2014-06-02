@@ -15,6 +15,7 @@ extern double setMountain;
 void restartGame()
 {
     lives = 3;
+    ufocount = 0;
     high_score = 0;
     rhinoReset();
     animalReset();
@@ -84,42 +85,23 @@ void draw_animal(void)
     glDisable(GL_ALPHA_TEST);
 }
 
-void draw_ufo(void)
-{
-    glPushMatrix();
-    glTranslatef(ufo.pos[0], ufo.pos[1], ufo.pos[2]);
-    glBindTexture(GL_TEXTURE_2D, UFOTexture);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.0f);
-    glColor4ub(255,255,255,255);
-    glBegin(GL_QUADS);
-    if (ufo.vel[0] > 0.0) {
-        glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
-    } else {
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-    }
-    glEnd();
-    glPopMatrix();
-    glDisable(GL_ALPHA_TEST);
-}
-
 void draw_white(void)
 {
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, WhiteTexture);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
-    glEnd();
-    glPopMatrix();
+    if (white_image == 1) {
+        glPushMatrix();
+        glBindTexture(GL_TEXTURE_2D, WhiteTexture);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, yres);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(xres, yres);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(xres, 0);
+        glEnd();
+        glPopMatrix();
+    }
+    else if (white_image == 8)
+    {
+        white_image = 0;
+    }
 }
 
 void draw_background(void)
@@ -128,7 +110,7 @@ void draw_background(void)
     double *yOFFsetLevel = &setLevel;
     double *yOFFsetMountain = &setMountain;
 
-    if(!start)
+    if(!start && !show_ufo)
     {
         *yOFFsetLevel -= 1;
         /*if(*yOFFsetLevel>100.0)*/
@@ -336,6 +318,7 @@ void mouse_click(int action)
                         rhinoReset();
                         animalReset();
                         kangarooReset();
+                        ufoReset();
                     }
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
@@ -416,7 +399,7 @@ void buttonRender (void)
     Rect r;
     for (i=0; i<nbuttons; i++) {
         if (button[i].over) {
-            glColor3f(1.0f, 0.0f, 0.0f);
+            glColor3f(0.5f, 0.5f, 0.5f);
             //draw a highlight around button
             glLineWidth(2);
             glBegin(GL_LINE_LOOP);
@@ -456,7 +439,7 @@ void buttonsInit(void)
     //
     //Start Game
     //size and position
-    button[nbuttons].r.width = 200;
+    button[nbuttons].r.width = 150;
     button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
     button[nbuttons].r.bot = 160;
@@ -467,9 +450,9 @@ void buttonsInit(void)
     strcpy(button[nbuttons].text, "Start Game");
     button[nbuttons].down = 0;
     button[nbuttons].click = 0;
-    button[nbuttons].color[0] = 0.4f;
-    button[nbuttons].color[1] = 0.4f;
-    button[nbuttons].color[2] = 0.7f;
+    button[nbuttons].color[0] = 0.1f;
+    button[nbuttons].color[1] = 0.1f;
+    button[nbuttons].color[2] = 0.1f;
     button[nbuttons].dcolor[0] = button[nbuttons].color[0] * 0.5f;
     button[nbuttons].dcolor[1] = button[nbuttons].color[1] * 0.5f;
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;
@@ -478,7 +461,7 @@ void buttonsInit(void)
     //
     //High Score
     //size and position
-    button[nbuttons].r.width = 200;
+    button[nbuttons].r.width = 150;
     button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
     button[nbuttons].r.bot = 85;
@@ -489,9 +472,9 @@ void buttonsInit(void)
     strcpy(button[nbuttons].text, "High Score");
     button[nbuttons].down = 0;
     button[nbuttons].click = 0;
-    button[nbuttons].color[0] = 0.4f;
-    button[nbuttons].color[1] = 0.4f;
-    button[nbuttons].color[2] = 0.7f;
+    button[nbuttons].color[0] = 0.1f;
+    button[nbuttons].color[1] = 0.1f;
+    button[nbuttons].color[2] = 0.1f;
     button[nbuttons].dcolor[0] = button[nbuttons].color[0] * 0.5f;
     button[nbuttons].dcolor[1] = button[nbuttons].color[1] * 0.5f;
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;
@@ -500,7 +483,7 @@ void buttonsInit(void)
     //
     //Quit button
     //size and position
-    button[nbuttons].r.width = 200;
+    button[nbuttons].r.width = 150;
     button[nbuttons].r.height = 50;
     button[nbuttons].r.left = xres/2 - button[nbuttons].r.width/2;
     button[nbuttons].r.bot = 10;
@@ -511,9 +494,9 @@ void buttonsInit(void)
     strcpy(button[nbuttons].text, "Quit");
     button[nbuttons].down = 0;
     button[nbuttons].click = 0;
-    button[nbuttons].color[0] = 0.4f;
-    button[nbuttons].color[1] = 0.4f;
-    button[nbuttons].color[2] = 0.7f;
+    button[nbuttons].color[0] = 0.1f;
+    button[nbuttons].color[1] = 0.1f;
+    button[nbuttons].color[2] = 0.1f;
     button[nbuttons].dcolor[0] = button[nbuttons].color[0] * 0.5f;
     button[nbuttons].dcolor[1] = button[nbuttons].color[1] * 0.5f;
     button[nbuttons].dcolor[2] = button[nbuttons].color[2] * 0.5f;

@@ -15,11 +15,12 @@
 #include "fonts.h"
 #include "timing.h"
 #include "xwin.h"
-#include "gameover.h"
 #include "punch.h"
 #include "hop.h"
 #include "struct.h"
 #include "Jose.h"
+#include "Gabe.h"
+#include "Iggy.h"
 
 #define USE_SOUND
 
@@ -80,6 +81,7 @@ Ppmimage *levelImage=NULL;
 Ppmimage *mountainsImage=NULL;
 Ppmimage *startImage=NULL;
 Ppmimage *whiteImage=NULL;
+Ppmimage *yellowImage = NULL;
 Ppmimage *rhinoImage=NULL;
 Ppmimage *animalImage=NULL;
 Ppmimage *ufoImage=NULL;
@@ -96,6 +98,7 @@ GLuint MountainTexture;
 GLuint LevelTexture;
 GLuint StartTexture;
 GLuint WhiteTexture;
+GLuint YellowTexture;
 GLuint punchleftTexture;
 GLuint punchrightTexture;
 GLuint lowhopTexture;
@@ -115,15 +118,21 @@ int show_rhino = 0;
 int show_animal = 0;
 int show_kangaroo = 1;
 int show_ufo = 0;
+int ufochoice = 0;
+int ufocount = 0;
 int show_car = 0;
 int background = 1;
 int start = 1;
 int white = 0;
-int gameover = 1;
+int white_image = 0;
+int gameover = 0;
 int lives = 3;
 int high_score = 0;    // high score tracker, prints in render()
+int soundcount = 0;    // high score tracker, prints in render()
 int punch = 0;
 int punch_image = 0;
+int yellow = 0;
+int yellow_image = 0;
 int hop = 0;
 int hop_image = 0;
 float wid = 120.0f;
@@ -134,7 +143,6 @@ double setMountain;
 int play_sounds = 1;
 #endif //USE_SOUND
 //
-static time_t seconds;
 
 int main(void)
 {
@@ -154,6 +162,7 @@ int main(void)
             check_mouse(&e);
             GOcheck_mouse(&e);
             check_keys(&e);
+
         }
         clock_gettime(CLOCK_REALTIME, &timeCurrent);
         timeSpan = timeDiff(&timeStart, &timeCurrent);
@@ -241,17 +250,16 @@ void init_opengl(void)
     kangarooImage    = ppm6GetImage("./images/ricky.ppm");
     levelImage       = ppm6GetImage("./images/LevelBlack.ppm");
     mountainsImage   = ppm6GetImage("./images/BackBlack.ppm");
-    startImage       = ppm6GetImage("./images/blank.ppm");
+    startImage       = ppm6GetImage("./images/start.ppm");
     whiteImage       = ppm6GetImage("./images/white.ppm");
-    gameoverImage    = ppm6GetImage("./images/gameover.ppm"); //-------------------------------------------------------
+    gameoverImage    = ppm6GetImage("./images/wasted.ppm"); //-------------------------------------------------------
     rhinoImage       = ppm6GetImage("./images/rhino.ppm");
     animalImage      = ppm6GetImage("./images/altrhino.ppm");
-    ufoImage	     = ppm6GetImage("./images/ufo.ppm");
+    /*ufoImage	     = ppm6GetImage("./images/ufo.ppm");*/
     //
     //create opengl texture elements
     glGenTextures(1, &RhinoTexture);
     glGenTextures(1, &AnimalTexture);
-    glGenTextures(1, &UFOTexture);
     glGenTextures(1, &KangarooTexture);
     glGenTextures(1, &LevelTexture);
     glGenTextures(1, &MountainTexture);
@@ -324,10 +332,11 @@ void init_opengl(void)
     //
     // UFO Spaceship
     //
-    int w3 = ufoImage->width;
-    int h3 = ufoImage->height;
+    ufoOpenGL();
+    /*int w3 = ufoImage->width;
+      int h3 = ufoImage->height;
 
-    glBindTexture(GL_TEXTURE_2D, UFOTexture);
+      glBindTexture(GL_TEXTURE_2D, UFOTexture);
     //
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
@@ -335,8 +344,8 @@ void init_opengl(void)
     //must build a new set of data...
     Transparent = buildAlphaData(ufoImage);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w3, h3, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
-    free(Transparent);
+    GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+    free(Transparent);*/
     //-------------------------------------------------------------------------
     //
     // Background - Platforms
@@ -413,7 +422,7 @@ void init_sounds(void)
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/KillingJokeIntro.mp3", 1)) {
+    if (fmod_createsound("./sounds/wasted.mp3", 1)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
@@ -422,7 +431,8 @@ void init_sounds(void)
         return;
     }
     fmod_setmode(0,FMOD_LOOP_NORMAL);
-    /*fmod_playsound(0);*/
+    if(!gameover)
+    fmod_playsound(0);
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -447,8 +457,7 @@ void init() {
     animal.height = 200.0;
     animal.height2 = animal.height * 0.5;
 
-    MakeVector(300.0,600.0,0.0, ufo.pos);
-    MakeVector(0.0,-6.0,0.0, ufo.vel);
+    init_ufo();
 }
 
 void rhinoReset(void)
@@ -495,6 +504,7 @@ void kangarooReset(void)
 
 void kangarooDeath(void)
 {
+    white ^= 1;
     lives--;
     rhinoReset();
     animalReset();
@@ -525,8 +535,15 @@ void check_keys(XEvent *e)
           start = 0;
           break;
           */
-        case XK_u:
-            show_ufo ^= 1;
+        ///////////////////////////////////
+        //DEBUG SHIT
+        case XK_p:
+                ufochoice = 0;
+            ufocount++;
+            break;
+        case XK_f:
+                ufochoice = 1;
+            ufocount++;
             break;
         case XK_j:
             kangarooDeath();
@@ -537,6 +554,7 @@ void check_keys(XEvent *e)
         case XK_l:
             lives -= lives;
             break;
+            ///////////////////////////////////
         case XK_a:
         case XK_Left:
             if (!(kangaroo.pos[0] - kangaroo.width2 < (xres-xres))) {
@@ -578,26 +596,53 @@ void check_keys(XEvent *e)
             hit_dist = rhino.pos[0] - rhino.height2;
             if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 90.0))
+                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
                 {
-                    if (show_rhino) {
+                    if (show_rhino && !show_ufo) {
                         rhinoReset();
+                        high_score += 100;
                     }
-                    high_score += 100;
+                    if (show_ufo && !ufochoice) {
+                        high_score += 50;
+                    }
+                    if (high_score%5000 ==  0) {
+                        ufocount++;
+                        printf("%d\n", ufocount);
+                    }
+                        printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
                 }
             }
             hit_dist = animal.pos[0] - animal.height2;
             if (animal.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
                     && animal.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 90.0))
+                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
                 {
-                    if (show_animal) {
+                    if (show_animal && !show_ufo) {
                         animalReset();
+                        high_score += 500;
                     }
-                    high_score += 500;
+                    if (show_ufo && !ufochoice) {
+                        high_score += 50;
+                    }
+                    if (high_score%5000 ==  0) {
+                        ufocount++;
+                        printf("%d\n", ufocount);
+                    }
                 }
             }
 
+            // Punch the kangaroo on the start page for 2 extra lives
+            if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start)
+                lives = 5;
+            break;
+        case XK_u:
+            if(ufocount > 0 )
+            {
+                if(!show_ufo) {
+                ufochoice = random(2);
+                }
+                show_ufo = 1;
+            }
             break;
         case XK_Escape:
             done=1;
@@ -610,7 +655,8 @@ void move_rhino()
     //auto move rhino...
     //int addgrav = 1;
     //Update position
-    rhino.pos[0] += rhino.vel[0]*1.5;
+    if(!show_ufo)
+        rhino.pos[0] += rhino.vel[0]*1.5;
     rhino.pos[1] += rhino.vel[1];
     //Check for collision with window edges
     if ((rhino.pos[0] < -140.0 && rhino.vel[0] < 0.0) ||
@@ -625,7 +671,8 @@ void move_animal()
     //auto move animal...
     //int addgrav = 1;
     //Update position
-    animal.pos[0] += animal.vel[0]*2;
+    if(!show_ufo)
+        animal.pos[0] += animal.vel[0]*2;
     animal.pos[1] += animal.vel[1];
     //Check for collision with window edges
     if ((animal.pos[0] < -140.0 && animal.vel[0] < 0.0) ||
@@ -633,11 +680,6 @@ void move_animal()
         animal.vel[0] = -animal.vel[0];
         animalReset();
     }
-}
-
-void move_ufo()
-{
-    ufo.pos[1] += ufo.vel[1];
 }
 
 void physics(void)
@@ -648,7 +690,7 @@ void physics(void)
     if(punch)
     {
         punch_image += 1;
-        if(punch_image == 3)
+        if(punch_image == 5)
         {
             punch_image = 0;
             punch ^= 1;
@@ -658,14 +700,34 @@ void physics(void)
     if(hop)
     {
         hop_image += 1;
-        if(hop_image == 3)
+        if(hop_image == 5)
         {
             hop_image = 0;
             hop ^= 1;
         }
     }
 
-    if (show_rhino) {
+    if(yellow)
+    {
+        yellow_image += 1;
+        if(yellow_image == 8)
+        {
+            yellow_image = 0;
+            yellow ^= 1;
+        }
+    }
+
+    if(white)
+    {
+        white_image += 1;
+        if(white_image == 8)
+        {
+            white_image = 0;
+            white ^= 1;
+        }
+    }
+
+    if (show_rhino && !show_ufo) {
         move_rhino();
         hit_dist = rhino.pos[0] - 100.0;
         d0 = kangaroo.pos[0] - hit_dist;
@@ -675,7 +737,7 @@ void physics(void)
             kangarooDeath();
         }
     }
-    if (show_animal) {
+    if (show_animal && !show_ufo) {
         move_animal();
         hit_dist = animal.pos[0] - 100.0;
         d0 = kangaroo.pos[0] - hit_dist;
@@ -721,21 +783,25 @@ void render(void)
     if (start) {
         StartMenu();
     }
+
+    perspective();
+
+    if(show_ufo)
+    {
+        draw_ufo();
+        draw_yellow();
+    }
     if(white)
     {
         draw_white();
     }
     if (lives <= 0) {
         GameOver();
+        gameover = 1;
+        if(soundcount == 0)
+        fmod_playsound(1);
+        soundcount++;
     }
-
-    perspective();
-
-    if (high_score >= 1000) {
-        draw_ufo();
-        show_ufo = 1;
-    }
-
 
     glDisable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -752,22 +818,25 @@ void render(void)
 
     if(start)
     {
-        r.bot = yres - 100;
-        r.left = xres/2;
-        r.center = 1;
-        unsigned int cref = 0x00ffffff;
+        r.bot = yres - 175;
+        r.left = (xres/2) - 80;
+        r.center = 0;
+        unsigned int cref = 0x00000000;
 
         //Help menu only show in start
-        ggprint8b(&r, 16, cref, "Move Up: UP Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Down: Down Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Left: Left Arrow Key");
-        ggprint8b(&r, 16, cref, "Move Right: Right Arrow Key");
-        ggprint8b(&r, 16, cref, "Punch: Space Key");
+        ggprint10(&r, 16, cref, "Move Up: UP Arrow Key");
+        ggprint10(&r, 16, cref, "Move Down: Down Arrow Key");
+        ggprint10(&r, 16, cref, "Move Left: Left Arrow Key");
+        ggprint10(&r, 16, cref, "Move Right: Right Arrow Key");
+        ggprint10(&r, 16, cref, "Punch: Space Key");
     }
-    if(show_kangaroo && show_rhino)
+    if(show_animal && show_rhino)
     {
         //In game menu, only show in game
         ggprint16(&r, 16, cref, "Lives: %i", lives);
         ggprint16(&r, 16, cref, "High Score: %i", high_score);
+        if(ufocount) {
+            ggprint16(&r, 16, cref, "UFO Help: %i", ufocount);
+        }
     }
 }
