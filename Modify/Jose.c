@@ -22,6 +22,9 @@ void restartGame()
     kangarooReset();
 }
 
+///////////////////////
+// Sets up textures
+///////////////////////
 void draw_kangaroo(void)
 {
     //Log("draw_kangaroo()...\n");
@@ -98,8 +101,7 @@ void draw_white(void)
         glEnd();
         glPopMatrix();
     }
-    else if (white_image == 8)
-    {
+    else if (white_image == 8) {
         white_image = 0;
     }
 }
@@ -110,8 +112,7 @@ void draw_background(void)
     double *yOFFsetLevel = &setLevel;
     double *yOFFsetMountain = &setMountain;
 
-    if(!start && !show_ufo)
-    {
+    if(!start && !show_ufo) {
         *yOFFsetLevel -= 1;
         /*if(*yOFFsetLevel>100.0)*/
         /**yOFFsetLevel -=100.0;*/
@@ -155,11 +156,9 @@ void perspective(void)
 
     /////////////////////////////////////////////////////////////
     //For the Perspective
-    if (kangaroo.pos[1] < rhino.pos[1])
-    {
-        if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
+    if (kangaroo.pos[1] < rhino.pos[1]) {
+        if (kangaroo.pos[1] < animal.pos[1]) {
+            if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -172,7 +171,7 @@ void perspective(void)
                     hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
             }
-            else if (animal.pos[1] >= rhino.pos[1]){
+            else if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_animal) {
                     draw_animal();
                 }
@@ -187,9 +186,8 @@ void perspective(void)
             }
         }
 
-        else if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
+        else if (kangaroo.pos[1] >= animal.pos[1]) {
+            if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -202,7 +200,7 @@ void perspective(void)
                     draw_animal();
                 }
             }
-            else if (animal.pos[1] >= rhino.pos[1]){
+            else if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -219,11 +217,9 @@ void perspective(void)
     }
     //////////////////////////////////////////
 
-    else if (kangaroo.pos[1] >= rhino.pos[1])
-    {
-        if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
+    else if (kangaroo.pos[1] >= rhino.pos[1]) {
+        if (kangaroo.pos[1] >= animal.pos[1]) {
+            if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -236,7 +232,7 @@ void perspective(void)
                     draw_rhino();
                 }
             }
-            else if (animal.pos[1] < rhino.pos[1]){
+            else if (animal.pos[1] < rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -251,9 +247,8 @@ void perspective(void)
             }
         }
 
-        else if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
+        else if (kangaroo.pos[1] < animal.pos[1]) {
+            if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_animal) {
                     draw_animal();
                 }
@@ -266,7 +261,7 @@ void perspective(void)
                     draw_rhino();
                 }
             }
-            else if (animal.pos[1] < rhino.pos[1]){
+            else if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -283,6 +278,9 @@ void perspective(void)
     }
 }
 
+//////////////////////
+// Start Menus Stuff
+//////////////////////
 void StartMenu(void)
 {
     glPushMatrix();
@@ -301,10 +299,8 @@ void StartMenu(void)
 
 void mouse_click(int action)
 {
-    if(start)
-    {
-        if (action == 1)
-        {
+    if(start) {
+        if (action == 1) {
             int i=0;
             //center of a grid
 
@@ -323,6 +319,7 @@ void mouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
+                        system("google-chrome www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
                     }
                     if (i==2) {
                         //user clicked QUIT
@@ -368,8 +365,9 @@ void check_mouse(XEvent *e)
         savey = e->xbutton.y;
     }
     //Log("xy: %i %i\n",x,y);
-    if (x == savex && y == savey)
+    if (x == savex && y == savey) {
         return;
+    }
     savex=x;
     savey=y;
 
@@ -387,10 +385,12 @@ void check_mouse(XEvent *e)
             break;
         }
     }
-    if (lbutton)
+    if (lbutton) {
         mouse_click(1);
-    if (rbutton)
+    }
+    if (rbutton) {
         mouse_click(1);
+    }
 }
 
 void buttonRender (void)
@@ -413,7 +413,8 @@ void buttonRender (void)
         }
         if (button[i].down) {
             glColor3fv(button[i].color);
-        } else {
+        }
+        else {
             glColor3fv(button[i].color);
         }
         glBegin(GL_QUADS);
@@ -427,7 +428,8 @@ void buttonRender (void)
         r.center = 1;
         if (button[i].down) {
             ggprint16(&r, 0, button[i].text_color, "Pressed!");
-        } else {
+        }
+        else {
             ggprint16(&r, 0, button[i].text_color, button[i].text);
         }
     }

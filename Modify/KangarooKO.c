@@ -422,7 +422,7 @@ void init_sounds(void)
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
-    if (fmod_createsound("./sounds/wasted.mp3", 1)) {
+    if (fmod_createsound("./sounds/Wasted.mp3", 1)) {
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
@@ -430,9 +430,17 @@ void init_sounds(void)
         printf("ERROR - fmod_createsound()\n\n");
         return;
     }
+    if (fmod_createsound("./sounds/Coin.mp3", 3)) {
+        printf("ERROR - fmod_createsound()\n\n");
+        return;
+    }
+    if (fmod_createsound("./sounds/Restart.wav", 4)) {
+        printf("ERROR - fmod_createsound()\n\n");
+        return;
+    }
     fmod_setmode(0,FMOD_LOOP_NORMAL);
-    if(!gameover)
-    fmod_playsound(0);
+    /*if(!gameover)
+        fmod_playsound(0);*/
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -504,6 +512,7 @@ void kangarooReset(void)
 
 void kangarooDeath(void)
 {
+    fmod_playsound(4);
     white ^= 1;
     lives--;
     rhinoReset();
@@ -538,11 +547,11 @@ void check_keys(XEvent *e)
         ///////////////////////////////////
         //DEBUG SHIT
         case XK_p:
-                ufochoice = 0;
+            ufochoice = 0;
             ufocount++;
             break;
         case XK_f:
-                ufochoice = 1;
+            ufochoice = 1;
             ufocount++;
             break;
         case XK_j:
@@ -609,7 +618,7 @@ void check_keys(XEvent *e)
                         ufocount++;
                         printf("%d\n", ufocount);
                     }
-                        printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
+                    printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
                 }
             }
             hit_dist = animal.pos[0] - animal.height2;
@@ -632,14 +641,16 @@ void check_keys(XEvent *e)
             }
 
             // Punch the kangaroo on the start page for 2 extra lives
-            if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start)
+            if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start) {
+                fmod_playsound(3);
                 lives = 5;
+            }
             break;
-        case XK_u:
+        case XK_Return:
             if(ufocount > 0 )
             {
                 if(!show_ufo) {
-                ufochoice = random(2);
+                    ufochoice = random(2);
                 }
                 show_ufo = 1;
             }
@@ -799,7 +810,7 @@ void render(void)
         GameOver();
         gameover = 1;
         if(soundcount == 0)
-        fmod_playsound(1);
+            fmod_playsound(1);
         soundcount++;
     }
 
