@@ -280,7 +280,7 @@ void punchKey(void)
                     if (show_ufo && !ufochoice) {
                         high_score += 50;
                     }
-                    if (high_score%5000 ==  0) {
+                    if (high_score%5000 ==  0 && !show_ufo) {
                         ufocount++;
                         printf("%d\n", ufocount);
                     }
@@ -299,7 +299,7 @@ void punchKey(void)
                     if (show_ufo && !ufochoice) {
                         high_score += 50;
                     }
-                    if (high_score%5000 ==  0) {
+                    if (high_score%5000 ==  0 && !show_ufo) {
                         ufocount++;
                         printf("%d\n", ufocount);
                     }
