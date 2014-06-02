@@ -1,3 +1,6 @@
+//Jose Hernandez
+//Most of the code, some left in Kangaroo.c
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,12 +9,22 @@
 #include "xwin.h"
 #include "Jose.h"
 #include "struct.h"
-#include "hop.h"
-#include "punch.h"
+#include "Bjarne.h"
+
+#define USE_SOUND
+
+#ifdef USE_SOUND
+#include <FMOD/fmod.h>
+#include <FMOD/wincompat.h>
+#include "fmod.h"
+#endif //USE_SOUND
 
 extern double setLevel;
 extern double setMountain;
 
+///////////////////////
+// Game Settup
+///////////////////////
 void restartGame()
 {
     lives = 3;
@@ -20,6 +33,59 @@ void restartGame()
     rhinoReset();
     animalReset();
     kangarooReset();
+}
+
+void rhinoReset(void)
+{
+    show_rhino = 1;
+
+    int i = random(4);
+
+    rhino.pos[0] = (float)xres + 150;
+    if (i == 1)
+        rhino.pos[1] = 260.0;
+    else if (i == 2)
+        rhino.pos[1] = 190.0;
+    else if (i == 3)
+        rhino.pos[1] = 120.0;
+    else
+        rhino.pos[1] = 60.0;
+}
+
+void animalReset(void)
+{
+    show_animal = 1;
+
+    int i = random(4);
+
+    animal.pos[0] = (float)xres + 150;
+    if (i == 1)
+        animal.pos[1] = 260.0;
+    else if (i == 2)
+        animal.pos[1] = 190.0;
+    else if (i == 3)
+        animal.pos[1] = 120.0;
+    else
+        animal.pos[1] = 60.0;
+}
+
+void kangarooReset(void)
+{
+    show_kangaroo = 1;
+
+    kangaroo.pos[1] = 60.0;
+    kangaroo.pos[0] = 60.0;
+}
+
+void kangarooDeath(void)
+{
+    fmod_playsound(4);
+    white ^= 1;
+    lives--;
+    rhinoReset();
+    animalReset();
+    kangarooReset();
+
 }
 
 ///////////////////////
