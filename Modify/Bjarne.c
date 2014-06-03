@@ -9,6 +9,7 @@
 #include "xwin.h"
 #include "struct.h"
 #include "Bjarne.h"
+#include "Angel.h"
 
 #define USE_SOUND
 
@@ -55,28 +56,28 @@ void init_hop_texture(int w2, int h2)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
     free(Transparent);
-/*
- *    //---------------------------------------------------------------
- *    //punch 3
- *
- *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
- *
- *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
- *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
- *    glTexImage2D(GL_TEXTURE_2D, 0, 3, w2, h2, 0,
- *            GL_RGB, GL_UNSIGNED_BYTE, punch3Image->data);
- *
- *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
- *    //
- *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
- *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
- *    //
- *    //must build a new set of data
- *    Transparent = buildAlphaData(punch3Image);
- *    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
- *            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
- *    free(Transparent);
- */
+    /*
+     *    //---------------------------------------------------------------
+     *    //punch 3
+     *
+     *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
+     *
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+     *    glTexImage2D(GL_TEXTURE_2D, 0, 3, w2, h2, 0,
+     *            GL_RGB, GL_UNSIGNED_BYTE, punch3Image->data);
+     *
+     *    glBindTexture(GL_TEXTURE_2D, punch3Texture);
+     *    //
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+     *    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+     *    //
+     *    //must build a new set of data
+     *    Transparent = buildAlphaData(punch3Image);
+     *    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0,
+     *            GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
+     *    free(Transparent);
+     */
     //---------------------------------------------------------------
 }
 
@@ -122,29 +123,29 @@ void hop_render(double x, double y, double z)
             glPopMatrix();
         }
         /*else if (punch_image == 3) {
-            glPushMatrix();
+          glPushMatrix();
 
-            glTranslatef(x, y, z);
-            glBindTexture(GL_TEXTURE_2D, punch3Texture);
-            glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, 0.0f);
-            glColor4ub(255,255,255,255);
-            glBegin(GL_QUADS);
-            //if (umbrella.vel[0] < 0.0) {
-            glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
-            glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
-            glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
-            glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
-            [>} else {
-              glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
-              glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
-              glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
-              glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
-            //}<]
-            glEnd();
-            glPopMatrix();
-            //
-            glDisable(GL_ALPHA_TEST);
+          glTranslatef(x, y, z);
+          glBindTexture(GL_TEXTURE_2D, punch3Texture);
+          glEnable(GL_ALPHA_TEST);
+          glAlphaFunc(GL_GREATER, 0.0f);
+          glColor4ub(255,255,255,255);
+          glBegin(GL_QUADS);
+        //if (umbrella.vel[0] < 0.0) {
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i( wid,-wid);
+        [>} else {
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid,-wid);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid, wid);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i( wid, wid);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i( wid,-wid);
+        //}<]
+        glEnd();
+        glPopMatrix();
+        //
+        glDisable(GL_ALPHA_TEST);
         }*/
         else {
             hop_image = 0;
@@ -264,53 +265,55 @@ void punch_render(double x, double y, double z)
 void punchKey(void)
 {
     Flt punch_dist, hit_dist;
-            punch ^= 1;
-            fmod_playsound(2);
+    punch ^= 1;
+    fmod_playsound(2);
 
-            punch_dist = kangaroo.pos[0] + kangaroo.height2;
-            hit_dist = rhino.pos[0] - rhino.height2;
-            if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
-                    && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
-                {
-                    if (show_rhino && !show_ufo) {
-                        rhinoReset();
-                        high_score += 100;
-                    }
-                    if (show_ufo && !ufochoice) {
-                        high_score += 50;
-                    }
-                    if (high_score%5000 ==  0 && !show_ufo) {
-                        ufocount++;
-                        printf("%d\n", ufocount);
-                    }
-                    printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
-                }
+    punch_dist = kangaroo.pos[0] + kangaroo.height2;
+    hit_dist = rhino.pos[0] - rhino.height2;
+    if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
+            && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
+        if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
+        {
+            if (show_rhino && !show_ufo) {
+                rhinoReset();
+                high_score += 100;
             }
-            hit_dist = animal.pos[0] - animal.height2;
-            if (animal.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
-                    && animal.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
-                {
-                    if (show_animal && !show_ufo) {
-                        animalReset();
-                        high_score += 500;
-                    }
-                    if (show_ufo && !ufochoice) {
-                        high_score += 50;
-                    }
-                    if (high_score%5000 ==  0 && !show_ufo) {
-                        ufocount++;
-                        printf("%d\n", ufocount);
-                    }
-                }
+            if (show_ufo && !ufochoice) {
+                high_score += 50;
             }
+            if (high_score%5000 ==  0) {
+                ufocount++;
+                printf("%d\n", ufocount);
+            }
+            printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
+        }
+    }
+    hit_dist = animal.pos[0] - animal.height2;
+    if (animal.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
+            && animal.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
+        if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
+        {
+            if (show_animal && !show_ufo) {
+                animalReset();
+                high_score += 500;
+            }
+            if (show_ufo && !ufochoice) {
+                high_score += 50;
+            }
+            if (high_score%5000 ==  0) {
+                ufocount++;
+                printf("%d\n", ufocount);
+            }
+        }
+    }
 
-            // Punch the kangaroo on the start page for 2 extra lives
-            if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start) {
-                fmod_playsound(3);
-                lives = 5;
-            }
+    applecollision();
+
+    // Punch the kangaroo on the start page for 2 extra lives
+    if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start) {
+        fmod_playsound(3);
+        lives = 5;
+    }
 }
 
 void move_rhino()
@@ -410,6 +413,9 @@ void physics(void)
             kangarooDeath();
         }
     }
+
+    applePhysics();
+
     if (show_ufo)
         move_ufo();
 }

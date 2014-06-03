@@ -385,7 +385,7 @@ void mouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
-                        system("google-chrome www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
+                        system(" www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
                     }
                     if (i==2) {
                         //user clicked QUIT
@@ -436,7 +436,6 @@ void check_mouse(XEvent *e)
     }
     savex=x;
     savey=y;
-
 
     for (i=0; i<nbuttons; i++) {
         button[i].over=0;
@@ -571,4 +570,3 @@ void buttonsInit(void)
     button[nbuttons].text_color = 0x00ffffff;
     nbuttons++;
 }
-

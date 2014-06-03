@@ -15,12 +15,11 @@
 #include "fonts.h"
 #include "timing.h"
 #include "xwin.h"
-#include "punch.h"
-#include "hop.h"
 #include "struct.h"
 #include "Jose.h"
 #include "Gabe.h"
 #include "Iggy.h"
+#include "Bjarne.h"
 
 #define USE_SOUND
 
@@ -64,9 +63,7 @@ void GOcheck_mouse(XEvent *e);
 void check_keys(XEvent *e);
 void init();
 void init_sounds(void);
-void physics(void);
 void render(void);
-void punchKey(void);
 
 Ppmimage *kangarooImage=NULL;
 Ppmimage *punchleftImage = NULL;
@@ -555,163 +552,6 @@ void check_keys(XEvent *e)
             done=1;
             break;
     }
-}
-
-void punchKey(void)
-{
-    Flt punch_dist, hit_dist;
-            punch ^= 1;
-            fmod_playsound(2);
-
-            punch_dist = kangaroo.pos[0] + kangaroo.height2;
-            hit_dist = rhino.pos[0] - rhino.height2;
-            if (rhino.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
-                    && rhino.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
-                {
-                    if (show_rhino && !show_ufo) {
-                        rhinoReset();
-                        high_score += 100;
-                    }
-                    if (show_ufo && !ufochoice) {
-                        high_score += 50;
-                    }
-                    if (high_score%5000 ==  0) {
-                        ufocount++;
-                        printf("%d\n", ufocount);
-                    }
-                    printf("len: %f height: %f\n", kangaroo.pos[0], kangaroo.pos[1]);
-                }
-            }
-            hit_dist = animal.pos[0] - animal.height2;
-            if (animal.pos[1] >= (kangaroo.pos[1] - kangaroo.height2)
-                    && animal.pos[1] <= (kangaroo.pos[1] + kangaroo.height2)) {
-                if ((hit_dist - punch_dist) >= 25 && (hit_dist - punch_dist <= 75.0))
-                {
-                    if (show_animal && !show_ufo) {
-                        animalReset();
-                        high_score += 500;
-                    }
-                    if (show_ufo && !ufochoice) {
-                        high_score += 50;
-                    }
-                    if (high_score%5000 ==  0) {
-                        ufocount++;
-                        printf("%d\n", ufocount);
-                    }
-                }
-            }
-
-            // Punch the kangaroo on the start page for 2 extra lives
-            if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start) {
-                fmod_playsound(3);
-                lives = 5;
-            }
-}
-
-void move_rhino()
-{
-    //auto move rhino...
-    //int addgrav = 1;
-    //Update position
-    if(!show_ufo)
-        rhino.pos[0] += rhino.vel[0]*1.5;
-    rhino.pos[1] += rhino.vel[1];
-    //Check for collision with window edges
-    if ((rhino.pos[0] < -140.0 && rhino.vel[0] < 0.0) ||
-            (rhino.pos[0] >= (float)xres+140.0 && rhino.vel[0] > 0.0)) {
-        rhino.vel[0] = -rhino.vel[0];
-        rhinoReset();
-    }
-}
-
-void move_animal()
-{
-    //auto move animal...
-    //int addgrav = 1;
-    //Update position
-    if(!show_ufo)
-        animal.pos[0] += animal.vel[0]*2;
-    animal.pos[1] += animal.vel[1];
-    //Check for collision with window edges
-    if ((animal.pos[0] < -140.0 && animal.vel[0] < 0.0) ||
-            (animal.pos[0] >= (float)xres+140.0 && animal.vel[0] > 0.0)) {
-        animal.vel[0] = -animal.vel[0];
-        animalReset();
-    }
-}
-
-void physics(void)
-{
-    Flt d0,d1,dist;
-    Flt hit_dist;
-
-    if(punch)
-    {
-        punch_image += 1;
-        if(punch_image == 5)
-        {
-            punch_image = 0;
-            punch ^= 1;
-        }
-    }
-
-    if(hop)
-    {
-        hop_image += 1;
-        if(hop_image == 5)
-        {
-            hop_image = 0;
-            hop ^= 1;
-        }
-    }
-
-    if(yellow)
-    {
-        yellow_image += 1;
-        if(yellow_image == 8)
-        {
-            yellow_image = 0;
-            yellow ^= 1;
-        }
-    }
-
-    if(white)
-    {
-        white_image += 1;
-        if(white_image == 8)
-        {
-            white_image = 0;
-            white ^= 1;
-        }
-    }
-
-    if (show_rhino && !show_ufo) {
-        move_rhino();
-        hit_dist = rhino.pos[0] - 100.0;
-        d0 = kangaroo.pos[0] - hit_dist;
-        d1 = kangaroo.pos[1] - rhino.pos[1];
-        dist = d0*d0+d1*d1;
-        if (dist < (50.0*50.0)) {
-            kangarooDeath();
-        }
-    }
-    if (show_animal && !show_ufo) {
-        move_animal();
-        hit_dist = animal.pos[0] - 100.0;
-        d0 = kangaroo.pos[0] - hit_dist;
-        d1 = kangaroo.pos[1] - animal.pos[1];
-        dist = d0*d0+d1*d1;
-        if (dist < (50.0*50.0)) {
-            kangarooDeath();
-        }
-    }
-    if (show_ufo)
-        move_ufo();
-    /*if ((kangaroo.pos[0] - rhino.pos[0]) == 0)
-      {
-      kangarooDeath();
-      }*/
 }
 
 void render(void)

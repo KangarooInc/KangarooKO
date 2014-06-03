@@ -20,6 +20,7 @@
 #include "Gabe.h"
 #include "Iggy.h"
 #include "Bjarne.h"
+#include "Angel.h"
 
 #define USE_SOUND
 
@@ -80,10 +81,8 @@ Ppmimage *rhinoImage=NULL;
 Ppmimage *animalImage=NULL;
 Ppmimage *ufoImage=NULL;
 Ppmimage *gameoverImage=NULL;
-Ppmimage *car1Image=NULL;
-Ppmimage *car2Image=NULL;
-Ppmimage *car3Image=NULL;
 Ppmimage *backgroundImage=NULL;
+Ppmimage *appleImage=NULL;
 GLuint KangarooTexture;
 GLuint RhinoTexture;
 GLuint AnimalTexture;
@@ -99,9 +98,7 @@ GLuint lowhopTexture;
 GLuint highhopTexture;
 //GLuint punch3Texture;
 GLuint GameOverTexture;
-GLuint car1texture;
-GLuint car2texture;
-GLuint car3texture;
+GLuint appletexture;
 
 //variables
 int done;
@@ -111,10 +108,10 @@ int nbuttons = 0;
 int show_rhino = 0;
 int show_animal = 0;
 int show_kangaroo = 1;
+int show_apple = 0;
 int show_ufo = 0;
 int ufochoice = 0;
 int ufocount = 0;
-int show_car = 0;
 int background = 1;
 int start = 1;
 int white = 0;
@@ -133,6 +130,7 @@ float wid = 120.0f;
 double setLevel;
 double setMountain;
 
+int count = 0;
 #ifdef USE_SOUND
 int play_sounds = 1;
 #endif //USE_SOUND
@@ -327,19 +325,6 @@ void init_opengl(void)
     // UFO Spaceship
     //
     ufoOpenGL();
-    /*int w3 = ufoImage->width;
-      int h3 = ufoImage->height;
-
-      glBindTexture(GL_TEXTURE_2D, UFOTexture);
-    //
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    //
-    //must build a new set of data...
-    Transparent = buildAlphaData(ufoImage);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w3, h3, 0,
-    GL_RGBA, GL_UNSIGNED_BYTE, Transparent);
-    free(Transparent);*/
     //-------------------------------------------------------------------------
     //
     // Background - Platforms
@@ -402,6 +387,9 @@ void init_opengl(void)
             gameoverImage->width, gameoverImage->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, gameoverImage->data);
     //-------------------------------------------------------------------------
+    //
+    // Apple reward
+    init_apple_texture();
 }
 
 void init_sounds(void)
@@ -434,7 +422,7 @@ void init_sounds(void)
     }
     fmod_setmode(0,FMOD_LOOP_NORMAL);
     /*if(!gameover)
-        fmod_playsound(0);*/
+      fmod_playsound(0);*/
     //fmod_systemupdate();
 #endif //USE_SOUND
 }
@@ -460,6 +448,8 @@ void init() {
     animal.height2 = animal.height * 0.5;
 
     init_ufo();
+
+    applevector();
 }
 
 void check_keys(XEvent *e)
@@ -538,7 +528,7 @@ void check_keys(XEvent *e)
             break;
         case XK_space:
             punchKey();
-           break;
+            break;
         case XK_Return:
             if(ufocount > 0 )
             {
@@ -584,6 +574,19 @@ void render(void)
     }
 
     perspective();
+
+
+
+    //####################################
+    if (high_score >= 1000 && count == 0) {
+        show_apple = 1;
+        count++;
+    }
+
+    if (show_apple) {
+        apple_render();
+    }
+    //#########################Angel
 
     if(show_ufo)
     {
