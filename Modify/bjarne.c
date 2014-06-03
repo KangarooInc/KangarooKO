@@ -169,7 +169,7 @@ void hop_render(double x, double y, double z)
     if (show_kangaroo) {
 
         //punch_image += 1;
-        if (hop_image == 1) {
+        if (hop_image == 1 || hop_image == 2) {
             glPushMatrix();
 
             glTranslatef(x, y, z);
@@ -194,7 +194,7 @@ void hop_render(double x, double y, double z)
             //
             glDisable(GL_ALPHA_TEST);
         }
-        else if (hop_image == 2) {
+        else if (hop_image == 3 || hop_image == 4) {
             glPushMatrix();
 
             glTranslatef(x, y, z);
