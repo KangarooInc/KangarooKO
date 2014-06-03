@@ -1,5 +1,5 @@
-// Author: Jose Hernandez
-// Most of the code I worked on. Some left in Kangaroo.c
+//Jose Hernandez
+//Most of the code, some left in Kangaroo.c
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,11 +9,22 @@
 #include "xwin.h"
 #include "Jose.h"
 #include "struct.h"
-#include "bjarne.h"
+#include "Bjarne.h"
+
+#define USE_SOUND
+
+#ifdef USE_SOUND
+#include <FMOD/fmod.h>
+#include <FMOD/wincompat.h>
+#include "fmod.h"
+#endif //USE_SOUND
 
 extern double setLevel;
 extern double setMountain;
 
+///////////////////////
+// Game Settup
+///////////////////////
 void restartGame()
 {
     lives = 3;
@@ -24,6 +35,62 @@ void restartGame()
     kangarooReset();
 }
 
+void rhinoReset(void)
+{
+    show_rhino = 1;
+
+    int i = random(4);
+
+    rhino.pos[0] = (float)xres + 150;
+    if (i == 1)
+        rhino.pos[1] = 260.0;
+    else if (i == 2)
+        rhino.pos[1] = 190.0;
+    else if (i == 3)
+        rhino.pos[1] = 120.0;
+    else
+        rhino.pos[1] = 60.0;
+}
+
+void animalReset(void)
+{
+    show_animal = 1;
+
+    int i = random(4);
+
+    animal.pos[0] = (float)xres + 150;
+    if (i == 1)
+        animal.pos[1] = 260.0;
+    else if (i == 2)
+        animal.pos[1] = 190.0;
+    else if (i == 3)
+        animal.pos[1] = 120.0;
+    else
+        animal.pos[1] = 60.0;
+}
+
+void kangarooReset(void)
+{
+    show_kangaroo = 1;
+
+    kangaroo.pos[1] = 60.0;
+    kangaroo.pos[0] = 60.0;
+}
+
+void kangarooDeath(void)
+{
+    fmod_playsound(4);
+    white ^= 1;
+    lives--;
+    rhinoReset();
+    animalReset();
+    kangarooReset();
+
+}
+
+///////////////////////
+// Sets up textures
+///////////////////////
 void draw_kangaroo(void)
 {
     //Log("draw_kangaroo()...\n");
@@ -100,8 +167,7 @@ void draw_white(void)
         glEnd();
         glPopMatrix();
     }
-    else if (white_image == 8)
-    {
+    else if (white_image == 8) {
         white_image = 0;
     }
 }
@@ -112,8 +178,7 @@ void draw_background(void)
     double *yOFFsetLevel = &setLevel;
     double *yOFFsetMountain = &setMountain;
 
-    if(!start && !show_ufo)
-    {
+    if(!start && !show_ufo) {
         *yOFFsetLevel -= 1;
         /*if(*yOFFsetLevel>100.0)*/
         /**yOFFsetLevel -=100.0;*/
@@ -157,11 +222,9 @@ void perspective(void)
 
     /////////////////////////////////////////////////////////////
     //For the Perspective
-    if (kangaroo.pos[1] < rhino.pos[1])
-    {
-        if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
+    if (kangaroo.pos[1] < rhino.pos[1]) {
+        if (kangaroo.pos[1] < animal.pos[1]) {
+            if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -174,7 +237,7 @@ void perspective(void)
                     hop_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
                 }
             }
-            else if (animal.pos[1] >= rhino.pos[1]){
+            else if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_animal) {
                     draw_animal();
                 }
@@ -189,9 +252,8 @@ void perspective(void)
             }
         }
 
-        else if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] < rhino.pos[1]){
+        else if (kangaroo.pos[1] >= animal.pos[1]) {
+            if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -204,7 +266,7 @@ void perspective(void)
                     draw_animal();
                 }
             }
-            else if (animal.pos[1] >= rhino.pos[1]){
+            else if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -221,11 +283,9 @@ void perspective(void)
     }
     //////////////////////////////////////////
 
-    else if (kangaroo.pos[1] >= rhino.pos[1])
-    {
-        if (kangaroo.pos[1] >= animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
+    else if (kangaroo.pos[1] >= rhino.pos[1]) {
+        if (kangaroo.pos[1] >= animal.pos[1]) {
+            if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -238,7 +298,7 @@ void perspective(void)
                     draw_rhino();
                 }
             }
-            else if (animal.pos[1] < rhino.pos[1]){
+            else if (animal.pos[1] < rhino.pos[1]) {
                 if (show_kangaroo) {
                     draw_kangaroo();
                     punch_render(kangaroo.pos[0],kangaroo.pos[1],kangaroo.pos[2]);
@@ -253,9 +313,8 @@ void perspective(void)
             }
         }
 
-        else if (kangaroo.pos[1] < animal.pos[1])
-        {
-            if (animal.pos[1] >= rhino.pos[1]){
+        else if (kangaroo.pos[1] < animal.pos[1]) {
+            if (animal.pos[1] >= rhino.pos[1]) {
                 if (show_animal) {
                     draw_animal();
                 }
@@ -268,7 +327,7 @@ void perspective(void)
                     draw_rhino();
                 }
             }
-            else if (animal.pos[1] < rhino.pos[1]){
+            else if (animal.pos[1] < rhino.pos[1]) {
                 if (show_rhino) {
                     draw_rhino();
                 }
@@ -285,6 +344,9 @@ void perspective(void)
     }
 }
 
+//////////////////////
+// Start Menus Stuff
+//////////////////////
 void StartMenu(void)
 {
     glPushMatrix();
@@ -303,10 +365,8 @@ void StartMenu(void)
 
 void mouse_click(int action)
 {
-    if(start)
-    {
-        if (action == 1)
-        {
+    if(start) {
+        if (action == 1) {
             int i=0;
             //center of a grid
 
@@ -325,6 +385,7 @@ void mouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
+                        system(" www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
                     }
                     if (i==2) {
                         //user clicked QUIT
@@ -370,11 +431,11 @@ void check_mouse(XEvent *e)
         savey = e->xbutton.y;
     }
     //Log("xy: %i %i\n",x,y);
-    if (x == savex && y == savey)
+    if (x == savex && y == savey) {
         return;
+    }
     savex=x;
     savey=y;
-
 
     for (i=0; i<nbuttons; i++) {
         button[i].over=0;
@@ -389,10 +450,12 @@ void check_mouse(XEvent *e)
             break;
         }
     }
-    if (lbutton)
+    if (lbutton) {
         mouse_click(1);
-    if (rbutton)
+    }
+    if (rbutton) {
         mouse_click(1);
+    }
 }
 
 void buttonRender (void)
@@ -415,7 +478,8 @@ void buttonRender (void)
         }
         if (button[i].down) {
             glColor3fv(button[i].color);
-        } else {
+        }
+        else {
             glColor3fv(button[i].color);
         }
         glBegin(GL_QUADS);
@@ -429,7 +493,8 @@ void buttonRender (void)
         r.center = 1;
         if (button[i].down) {
             ggprint16(&r, 0, button[i].text_color, "Pressed!");
-        } else {
+        }
+        else {
             ggprint16(&r, 0, button[i].text_color, button[i].text);
         }
     }
@@ -505,4 +570,3 @@ void buttonsInit(void)
     button[nbuttons].text_color = 0x00ffffff;
     nbuttons++;
 }
-

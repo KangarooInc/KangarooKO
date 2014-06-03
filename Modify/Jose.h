@@ -3,10 +3,12 @@
 #include <GL/glx.h>
 #include "fonts.h"
 
+#define random(a) (rand()%a)
 #define MAXBUTTONS 8
 
 // Variables
 extern float wid;
+extern int white;
 extern int lives;
 extern int high_score;
 extern int start;
@@ -47,6 +49,7 @@ void ufoReset(void);
 void rhinoReset(void);
 void animalReset(void);
 void kangarooReset(void);
+void kangarooDeath(void);
 
 // Struct
 typedef struct t_button {

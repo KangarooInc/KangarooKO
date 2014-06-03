@@ -62,6 +62,12 @@ void GOmouse_click(int action)
                         soundcount = 0;
                     }
                     if (i==1) {
+                        //user clicked MIDDLE button (highscore)
+                        printf("Hello Kangaroo \n");
+                        system("google-chrome www.cs.csub.edu/~gmontenegro/cs335/GAME/submitScore.php");
+                    }
+
+                    if (i==2) {
                         //user clicked QUIT
                         done = 1;
                     }
@@ -154,13 +160,34 @@ void GObuttonsInit(void)
     GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
     GObutton[nbuttons].text_color = 0x00000000;
     nbuttons++;
-    //
+        //
+    //Submit score
+     GObutton[nbuttons].r.width = 200;
+    GObutton[nbuttons].r.height = 50;
+    GObutton[nbuttons].r.left = xres/2 - GObutton[nbuttons].r.width/2;
+    GObutton[nbuttons].r.bot = 85;
+    GObutton[nbuttons].r.right = GObutton[nbuttons].r.left + GObutton[nbuttons].r.width;
+    GObutton[nbuttons].r.top = GObutton[nbuttons].r.bot + GObutton[nbuttons].r.height;
+    GObutton[nbuttons].r.centerx = (GObutton[nbuttons].r.left + GObutton[nbuttons].r.right) / 2;
+    GObutton[nbuttons].r.centery = (GObutton[nbuttons].r.bot + GObutton[nbuttons].r.top) / 2;
+    strcpy(GObutton[nbuttons].text, "Submit Scores");
+    GObutton[nbuttons].down = 0;
+    GObutton[nbuttons].click = 0;
+    GObutton[nbuttons].color[0] = 1.0f;
+    GObutton[nbuttons].color[1] = 1.0f;
+    GObutton[nbuttons].color[2] = 1.0f;
+    GObutton[nbuttons].dcolor[0] = GObutton[nbuttons].color[0] * 0.5f;
+    GObutton[nbuttons].dcolor[1] = GObutton[nbuttons].color[1] * 0.5f;
+    GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
+    GObutton[nbuttons].text_color = 0x00000000;
+    nbuttons++;
+//
     // Quit button
     //size and position
     GObutton[nbuttons].r.width = 200;
     GObutton[nbuttons].r.height = 50;
     GObutton[nbuttons].r.left = xres/2 - GObutton[nbuttons].r.width/2;
-    GObutton[nbuttons].r.bot = 85;
+    GObutton[nbuttons].r.bot = 10;
     GObutton[nbuttons].r.right = GObutton[nbuttons].r.left + GObutton[nbuttons].r.width;
     GObutton[nbuttons].r.top = GObutton[nbuttons].r.bot + GObutton[nbuttons].r.height;
     GObutton[nbuttons].r.centerx = (GObutton[nbuttons].r.left + GObutton[nbuttons].r.right) / 2;
