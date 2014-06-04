@@ -308,6 +308,7 @@ void punchKey(void)
     }
 
     applecollision();
+    bapplecollision();
 
     // Punch the kangaroo on the start page for 2 extra lives
     if(kangaroo.pos[0] == 462 && kangaroo.pos[1] == 127 && start) {
@@ -415,6 +416,7 @@ void physics(void)
     }
 
     applePhysics();
+    bapplePhysics();
 
     if (show_ufo)
         move_ufo();

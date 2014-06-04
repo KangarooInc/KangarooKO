@@ -23,7 +23,7 @@ extern double setLevel;
 extern double setMountain;
 
 ///////////////////////
-// Game Settup
+// Game Setup
 ///////////////////////
 void restartGame()
 {
@@ -85,7 +85,6 @@ void kangarooDeath(void)
     rhinoReset();
     animalReset();
     kangarooReset();
-
 }
 
 ///////////////////////

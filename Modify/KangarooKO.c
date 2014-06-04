@@ -83,6 +83,7 @@ Ppmimage *ufoImage=NULL;
 Ppmimage *gameoverImage=NULL;
 Ppmimage *backgroundImage=NULL;
 Ppmimage *appleImage=NULL;
+Ppmimage *bappleImage=NULL;
 GLuint KangarooTexture;
 GLuint RhinoTexture;
 GLuint AnimalTexture;
@@ -99,6 +100,7 @@ GLuint highhopTexture;
 //GLuint punch3Texture;
 GLuint GameOverTexture;
 GLuint appletexture;
+GLuint bappletexture;
 
 //variables
 int done;
@@ -109,6 +111,7 @@ int show_rhino = 0;
 int show_animal = 0;
 int show_kangaroo = 1;
 int show_apple = 0;
+int show_bapple = 0;
 int show_ufo = 0;
 int ufochoice = 0;
 int ufocount = 0;
@@ -130,7 +133,13 @@ float wid = 120.0f;
 double setLevel;
 double setMountain;
 
+time_t bseconds;///////////////////////////////jontime
+time_t seconds;///////////////////////////////jontime
+time_t bupdate ;//////////////////////////////
+time_t update ;//////////////////////////////
+
 int count = 0;
+int bcount = 0;
 #ifdef USE_SOUND
 int play_sounds = 1;
 #endif //USE_SOUND
@@ -138,6 +147,8 @@ int play_sounds = 1;
 
 int main(void)
 {
+    bseconds = seconds = time(NULL);////////////////////////////////////////////////jontime
+    bupdate = update = seconds+7;//////////////////////////////////////////////
     logOpen();
     initXWindows();
     init_opengl();
@@ -390,6 +401,7 @@ void init_opengl(void)
     //
     // Apple reward
     init_apple_texture();
+    init_bapple_texture();
 }
 
 void init_sounds(void)
@@ -450,6 +462,7 @@ void init() {
     init_ufo();
 
     applevector();
+    bad_applevector();
 }
 
 void check_keys(XEvent *e)
@@ -546,6 +559,7 @@ void check_keys(XEvent *e)
 
 void render(void)
 {
+    bseconds = seconds = time(NULL);//////////////////TIME!!!!!!
     Rect r;
     //Clear the screen
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -575,18 +589,33 @@ void render(void)
 
     perspective();
 
-
-
-    //####################################
-    if (high_score >= 1000 && count == 0) {
+    //######################################################
+    if (high_score >= 2000 && count == 0) {
         show_apple = 1;
         count++;
+	update = time(NULL) + 5;
     }
 
     if (show_apple) {
         apple_render();
+	if(update < seconds){
+	    show_apple = 0;
+	}
     }
-    //#########################Angel
+
+    if (high_score >= 3500 && bcount == 0) {
+        show_bapple = 1;
+        bcount++;
+	update = time(NULL)+7;
+    }
+
+    if (show_bapple) {
+        bapple_render();
+	if(update < seconds){
+	    show_bapple = 0;
+	}
+    }
+//###################################################ANGEL!!!!!!!!
 
     if(show_ufo)
     {
