@@ -384,7 +384,7 @@ void mouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
-                        system(" www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
+                        system("google-chrome  www.cs.csub.edu/~gmontenegro/cs335/GAME/highScore.php");
                     }
                     if (i==2) {
                         //user clicked QUIT

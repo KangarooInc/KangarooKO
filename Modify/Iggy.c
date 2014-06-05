@@ -64,7 +64,16 @@ void GOmouse_click(int action)
                     if (i==1) {
                         //user clicked MIDDLE button (highscore)
                         printf("Hello Kangaroo \n");
-                        system("google-chrome www.cs.csub.edu/~gmontenegro/cs335/GAME/submitScore.php");
+                        //*****************************************************************
+                        char *buf=(char*)malloc(sizeof(char)*(20));
+                        sprintf(buf,"%d",high_score);
+                        char *tmpScore=(char*) malloc(sizeof(char)*(2));
+                        tmpScore=buf;//"33";
+                        char *page=(char*)malloc(sizeof(char)*(200));
+                        strcpy(page,"google-chrome www.cs.csub.edu/~gmontenegro/cs335/GAME/submitScore.php?param=");
+                        strcat(page,tmpScore);
+                        system(page);
+                        //*************************************************************
                     }
 
                     if (i==2) {
@@ -160,9 +169,9 @@ void GObuttonsInit(void)
     GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
     GObutton[nbuttons].text_color = 0x00000000;
     nbuttons++;
-        //
+    //
     //Submit score
-     GObutton[nbuttons].r.width = 200;
+    GObutton[nbuttons].r.width = 200;
     GObutton[nbuttons].r.height = 50;
     GObutton[nbuttons].r.left = xres/2 - GObutton[nbuttons].r.width/2;
     GObutton[nbuttons].r.bot = 85;
@@ -181,7 +190,7 @@ void GObuttonsInit(void)
     GObutton[nbuttons].dcolor[2] = GObutton[nbuttons].color[2] * 0.5f;
     GObutton[nbuttons].text_color = 0x00000000;
     nbuttons++;
-//
+    //
     // Quit button
     //size and position
     GObutton[nbuttons].r.width = 200;

@@ -433,8 +433,8 @@ void init_sounds(void)
         return;
     }
     fmod_setmode(0,FMOD_LOOP_NORMAL);
-    /*if(!gameover)
-      fmod_playsound(0);*/
+    if(!gameover)
+      fmod_playsound(0);
     //fmod_systemupdate();
 #endif //USE_SOUND
 }

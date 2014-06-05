@@ -86,7 +86,7 @@ void hop_render(double x, double y, double z)
     if (show_kangaroo) {
 
         //punch_image += 1;
-        if (hop_image == 1 || hop_image == 2) {
+        if (hop_image == 1) {
             glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
             glPushMatrix();
             glTranslatef(x, y, z);
@@ -104,7 +104,7 @@ void hop_render(double x, double y, double z)
             glDisable(GL_ALPHA_TEST);
             glPopMatrix();
         }
-        else if (hop_image == 3 || hop_image == 4) {
+        else if (hop_image == 2) {
             glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
             glPushMatrix();
             glTranslatef(x, y, z);
@@ -220,7 +220,7 @@ void punch_render(double x, double y, double z)
     if (show_kangaroo) {
 
         //punch_image += 1;
-        if (punch_image == 1 || punch_image == 2) {
+        if (punch_image == 1) {
             glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
             glPushMatrix();
             glTranslatef(x, y, z);
@@ -239,7 +239,7 @@ void punch_render(double x, double y, double z)
             glPopMatrix();
         }
 
-        else if (punch_image == 3 || punch_image == 4) {
+        else if (punch_image == 2) {
             glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
             glPushMatrix();
             glTranslatef(x, y, z);
@@ -281,7 +281,7 @@ void punchKey(void)
             if (show_ufo && !ufochoice) {
                 high_score += 50;
             }
-            if (high_score%5000 ==  0) {
+            if (high_score%5000 ==  0 && !show_ufo) {
                 ufocount++;
                 printf("%d\n", ufocount);
             }
@@ -300,7 +300,7 @@ void punchKey(void)
             if (show_ufo && !ufochoice) {
                 high_score += 50;
             }
-            if (high_score%5000 ==  0) {
+            if (high_score%5000 ==  0 && !show_ufo) {
                 ufocount++;
                 printf("%d\n", ufocount);
             }
@@ -357,7 +357,7 @@ void physics(void)
     if(punch)
     {
         punch_image += 1;
-        if(punch_image == 5)
+        if(punch_image == 3)
         {
             punch_image = 0;
             punch ^= 1;
@@ -367,7 +367,7 @@ void physics(void)
     if(hop)
     {
         hop_image += 1;
-        if(hop_image == 5)
+        if(hop_image == 3)
         {
             hop_image = 0;
             hop ^= 1;
